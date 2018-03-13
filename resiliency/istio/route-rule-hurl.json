@@ -1,0 +1,27 @@
+{
+    "type": "routerules",
+    "name": "hurl-default",
+    "locations": [
+        {
+            "name": "awsqa"
+        }
+    ],
+	"user": "${KUBE_USER}",
+    "token": "${KUBE_TOKEN}",
+    "namespace": "${KUBE_NAMESPACE}",
+    "k8s": {
+        "spec": {
+            "destination": {
+                "name": "hurl"
+            }, 
+            "precedence": 1,
+            "route": [
+                {
+                    "labels": {
+                        "service": "hurl"
+                    }
+                }
+            ]
+        }
+    }
+}

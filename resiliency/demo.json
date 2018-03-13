@@ -1,0 +1,166 @@
+{
+    "title": "Resiliency Demo",
+    "stepsPosition": 2,
+    "sites": {
+        "webnull": {
+            "title": "/web/null",
+            "url": "$WEBNULL",
+            "position": 4
+        },
+        "hurl": {
+            "title": "hURL",
+            "url": "$HURL",
+            "position": 0
+        }
+    },
+    "processes": {
+        "bash": {
+            "title": "bash",
+            "command": ["bash"],
+            "dir": "./istio",
+            "position": 1,
+            "exitInput": "exit"
+        },
+        "kubeexec": {
+            "title": "kubectl exec",
+            "command": ["kubectl", "exec", "-i", "$POD", "-c", "hurl", "/bin/sh"],
+            "dir": "",
+            "position": 3,
+            "exitInput": "exit"
+        }
+    },
+    "steps": [
+        {
+            "title": "Check the running containers",
+            "desc": "The containers were deployed earlier.",
+            "id": "bash",
+            "input": "kubectl get pods | egrep '(^NAME|webnull|hurl)'"
+        },
+        {
+            "title": "Check the route rules",
+            "desc": "These rules were created earlier.",
+            "id": "bash",
+            "input": "istioctl get routerules | egrep '(^NAME|webnull|hurl)'"
+        },
+        {
+            "title": "Check the destination policies",
+            "desc": "These policies were created earlier.",
+            "id": "bash",
+            "input": "istioctl get destinationpolicies | egrep '(^NAME|webnull|hurl)'"
+        },
+        {
+            "title": "Create some initial load",
+            "desc": "Using 10 connections, hurl sends load to webnull.",
+            "id": "kubeexec",
+            "input": "hurl -conns 10 -loop 2000000 http://webnull:8080/xml 2> /dev/null &"
+        },
+        {
+            "title": "Test circuit breaker",
+            "desc": "By bumping the connections to 100, we'll trigger the circuit breaker.",
+            "id": "kubeexec",
+            "input": "kill -15 `pidof hurl`; hurl -conns 100 -loop 2000000 http://webnull:8080/xml 2> /dev/null &"
+        },
+        {
+            "title": "Look at the circuit breaker policy",
+            "desc": "Let's take a look at the circuit breaker destination policy.",
+            "id": "bash",
+            "input": "istioctl get destinationpolicy webnull-circuit-breaker -n $KUBE_NAMESPACE -o yaml"
+        },
+        {
+            "title": "Return to normal load",
+            "desc": "Restore the connections to 10.",
+            "id": "kubeexec",
+            "input": "kill -15 `pidof hurl`; hurl -conns 10 -loop 2000000 http://webnull:8080/xml 2> /dev/null &"
+        },
+        {
+            "title": "Test fault injection",
+            "desc": "Inject a 400 error in 1% of the requests.",
+            "id": "bash",
+            "input": "istioctl create -f inject-abort.yaml -n $KUBE_NAMESPACE"
+        },
+        {
+            "title": "Look at the fault injection rule",
+            "desc": "Let's take a look at the fault injection route rule.",
+            "id": "bash",
+            "input": "istioctl get routerule webnull-test-abort -n $KUBE_NAMESPACE -o yaml"
+        },
+        {
+            "title": "Remove the fault",
+            "desc": "Remove the rule that injects faults.",
+            "id": "bash",
+            "input": "istioctl delete routerule webnull-test-abort -n $KUBE_NAMESPACE"
+        },
+        {
+            "title": "Test delay injection",
+            "desc": "Now create a rule that injects a 1s delay in 5% of the requests.",
+            "id": "bash",
+            "input": "istioctl create -f inject-delay.yaml -n $KUBE_NAMESPACE"
+        },
+        {
+            "title": "Look at the delay injection rule",
+            "desc": "Let's take a look at the delay injection route rule.",
+            "id": "bash",
+            "input": "istioctl get routerule webnull-test-delay -n $KUBE_NAMESPACE -o yaml"
+        },
+        {
+            "title": "Remove the delay",
+            "desc": "Remove the rule that injects the delay.",
+            "id": "bash",
+            "input": "istioctl delete routerule webnull-test-delay -n $KUBE_NAMESPACE"
+        },
+        {
+            "title": "Inject a large delay",
+            "desc": "Create a rule that injects in 4s delay in 25% of the requests.",
+            "id": "bash",
+            "input": "istioctl create -f inject-big-delay.yaml -n $KUBE_NAMESPACE"
+        },
+        {
+            "title": "Increase load",
+            "desc": "To be realistic, requests would back up, increasing the connections.",
+            "id": "kubeexec",
+            "input": "kill -15 `pidof hurl`; hurl -conns 100 -loop 2000000 http://webnull:8080/xml 2> /dev/null &"
+        },
+        {
+            "title": "Fix the delay",
+            "desc": "Let's \"fix\" the delay by removing the route rule.",
+            "id": "bash",
+            "input": "istioctl delete routerule webnull-test-bigdelay -n $KUBE_NAMESPACE"
+        },
+        {
+            "title": "Connections should return to normal",
+            "desc": "Though a bit artificial, we'll reduce the connections back to normal.",
+            "id": "kubeexec",
+            "input": "kill -15 `pidof hurl`; hurl -conns 10 -loop 2000000 http://webnull:8080/xml 2> /dev/null &"
+        },
+        {
+            "title": "Try a long request",
+            "desc": "We're going to check on request timeouts, so let's try a long request.",
+            "id": "kubeexec",
+            "input": "kill -15 `pidof hurl`; hurl http://webnull:8080/delay/5000"
+        },
+        {
+            "title": "Set up request timeout rule",
+            "desc": "Configure a request timeout rule.",
+            "id": "bash",
+            "input": "istioctl create -f request-timeout.yaml -n $KUBE_NAMESPACE"
+        },
+        {
+            "title": "Look at the request timeout rule",
+            "desc": "Let's take a look at the request timeout route rule.",
+            "id": "bash",
+            "input": "istioctl get routerule webnull-request-timeout -n $KUBE_NAMESPACE -o yaml"
+        },
+        {
+            "title": "Try the long request again",
+            "desc": "This time it should time out after 3s.",
+            "id": "kubeexec",
+            "input": "hurl http://webnull:8080/delay/5000"
+        },
+        {
+            "title": "Clean up the timeout rule",
+            "desc": "Clean up after ourselves.",
+            "id": "bash",
+            "input": "istioctl delete routerule webnull-request-timeout -n $KUBE_NAMESPACE"
+        }
+    ]
+}

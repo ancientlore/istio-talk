@@ -1,0 +1,27 @@
+{
+    "type": "routerules",
+    "name": "topdogui-default",
+    "locations": [
+        {
+            "name": "awsqa"
+        }
+    ],
+	"user": "${KUBE_USER}",
+    "token": "${KUBE_TOKEN}",
+    "namespace": "${KUBE_NAMESPACE}",
+    "k8s": {
+        "spec": {
+            "destination": {
+                "name": "topdogui"
+            }, 
+            "precedence": 1,
+            "route": [
+                {
+                    "labels": {
+                        "version": "v1"
+                    }
+                }
+            ]
+        }
+    }
+}

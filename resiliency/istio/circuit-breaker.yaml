@@ -1,0 +1,19 @@
+apiVersion: config.istio.io/v1beta1
+kind: DestinationPolicy
+metadata:
+  name: webnull-circuit-breaker
+spec:
+  destination:
+    name: webnull
+    labels:
+      service: webnull
+  circuitBreaker:
+    simpleCb:
+      maxConnections: 50
+      httpMaxPendingRequests: 1
+      httpMaxRequests: 100
+      sleepWindow: 15s
+      httpDetectionInterval: 1s
+      httpMaxEjectionPercent: 100
+      httpConsecutiveErrors: 1
+      #httpMaxRequestsPerConnection: 1

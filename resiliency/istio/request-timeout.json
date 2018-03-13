@@ -1,0 +1,32 @@
+{
+    "type": "routerules",
+    "name": "webnull-request-timeout",
+    "locations": [
+        {
+            "name": "awsqa"
+        }
+    ],
+	"user": "${KUBE_USER}",
+    "token": "${KUBE_TOKEN}",
+    "namespace": "${KUBE_NAMESPACE}",
+    "k8s": {
+        "spec": {
+            "destination": {
+                "name": "webnull"
+            }, 
+            "precedence": 2,
+            "route": [
+                {
+                    "labels": {
+                        "service": "webnull"
+                    }
+                }
+            ],
+            "httpReqTimeout": {
+                "simpleTimeout": {
+                    "timeout": "3s"
+                }
+            }
+        }
+    }
+}

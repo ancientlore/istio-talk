@@ -1,0 +1,124 @@
+{
+    "title": "Traffic Shifting Demo",
+    "stepsPosition": 1,
+    "sites": {
+        "topdog": {
+            "title": "topdog",
+            "url": "$TOPDOG",
+            "position": 0
+        }
+    },
+    "processes": {
+        "bash": {
+            "title": "bash",
+            "command": ["bash"],
+            "dir": "./istio",
+            "position": 2,
+            "exitInput": "exit"
+        }
+    },
+    "steps": [
+        {
+            "title": "Check the running pods",
+            "desc": "The topdog pods were deployed earlier. Normally, we wouldn't deploy all three versions at once.",
+            "id": "bash",
+            "input": "kubectl get pods | egrep '(^NAME|topdog)'"
+        },
+        {
+            "title": "Check the route rules",
+            "desc": "These rules were created earlier. They direct all traffic to v1 of the topdog services.",
+            "id": "bash",
+            "input": "istioctl get routerules | egrep '(^NAME|topdog)'"
+        },
+        {
+            "title": "Inspect a route rule",
+            "desc": "The route rule specifies the version using Kubernetes labels.",
+            "id": "bash",
+            "input": "istioctl get routerule topdogbe-default -n $KUBE_NAMESPACE -o yaml"
+        },
+        {
+            "title": "Observe the problem with v1",
+            "desc": "Never let a candidate create the voting machine...",
+            "id": "bash",
+            "input": ""
+        },
+        {
+            "title": "Fix the service with v2",
+            "desc": "A team member fixed the unabashed bias. Let's roll it out 50/50 between v1 and v2.",
+            "id": "bash",
+            "input": "istioctl create -f route-rule-be-v1-v2.yaml -n $KUBE_NAMESPACE"
+        },
+        {
+            "title": "Look at the traffic shifting rule",
+            "desc": "While we wait for it to apply, let's inspect what the traffic shifting rule looks like.",
+            "id": "bash",
+            "input": "istioctl get routerule topdogbe-shift -n $KUBE_NAMESPACE -o yaml"
+        },
+        {
+            "title": "Observe the 50/50 utilization, and a new bug",
+            "desc": "Hmmm, sometimes v2 fails. Using zipkin, we find that a retry might fix the issue.",
+            "id": "bash",
+            "input": ""
+        },
+        {
+            "title": "Fix v2 with an HTTP retry rule",
+            "desc": "Retries to the midtier will fix the v2 problem. That's better than reverting in this case.",
+            "id": "bash",
+            "input": "istioctl create -f route-rule-mt-retry.yaml -n $KUBE_NAMESPACE"
+        },
+        {
+            "title": "Look at the retry rule",
+            "desc": "While we wait for it to apply, let's inspect what the retry rule looks like.",
+            "id": "bash",
+            "input": "istioctl get routerule topdogmt-retry -n $KUBE_NAMESPACE -o yaml"
+        },
+        {
+            "title": "Move all traffic to v2",
+            "desc": "Everything looks good, so we'll reset the default route rule to v2.",
+            "id": "bash",
+            "input": "istioctl replace -f route-rule-be-v2.yaml -n $KUBE_NAMESPACE"
+        },
+        {
+            "title": "Remove the traffic shifting rule",
+            "desc": "The traffic shifting rule is no longer needed.",
+            "id": "bash",
+            "input": "istioctl delete routerule topdogbe-shift -n $KUBE_NAMESPACE"
+        },
+        {
+            "title": "Shift traffic to a v3 which fixes the 500 bug",
+            "desc": "Now a team member fixes the v2 bug.",
+            "id": "bash",
+            "input": "istioctl create -f route-rule-be-v2-v3.yaml -n $KUBE_NAMESPACE"
+        },
+        {
+            "title": "Looking good, so let's move all traffic to v3",
+            "desc": "Reset the default route rule to v3.",
+            "id": "bash",
+            "input": "istioctl replace -f route-rule-be-v3.yaml -n $KUBE_NAMESPACE"
+        },
+        {
+            "title": "And delete the traffic shifting rule",
+            "desc": "The traffic shifting rule is no longer needed.",
+            "id": "bash",
+            "input": "istioctl delete routerule topdogbe-shift -n $KUBE_NAMESPACE"
+        },
+        {
+            "title": "Are the results still skewed?",
+            "desc": "I see bias, but less obvious.",
+            "id": "bash",
+            "input": ""
+        },
+        {
+            "title": "Clean up - back to v1",
+            "desc": "The demo is done, so let's move everything back to v1.",
+            "id": "bash",
+            "input": "istioctl replace -f route-rule-all-v1.yaml -n $KUBE_NAMESPACE"
+        },
+        {
+            "title": "More clean up - remove retry",
+            "desc": "The demo is done, so let's remove thre retry rule.",
+            "id": "bash",
+            "input": "istioctl delete routerule topdogmt-retry -n $KUBE_NAMESPACE"
+        }
+    ]
+}

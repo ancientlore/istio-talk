@@ -1,0 +1,26 @@
+apiVersion: config.istio.io/v1alpha2
+kind: RouteRule
+metadata:
+  name: webnull-test-abort
+spec:
+  #
+  destination:
+    name: webnull
+  precedence: 5
+  route:
+  - labels:
+      #version: 1.1.1
+      service: webnull
+  match:
+    #source:
+    #  name: istio-ingress
+    #  labels:
+    #    istio: ingress
+    request:
+      headers:
+        method:
+          exact: GET
+  httpFault:
+    abort:
+      httpStatus: 400
+      percent: 1

@@ -1,0 +1,23 @@
+apiVersion: config.istio.io/v1alpha2
+kind: RouteRule
+metadata:
+  name: webnull-test-delay
+spec:
+  #
+  destination:
+    name: webnull
+  precedence: 3
+  route:
+  - labels:
+      service: webnull
+  match:
+    request:
+      headers:
+        method:
+          exact: GET
+        #uri:
+        #  prefix: /xml
+  httpFault:
+    delay:
+      fixedDelay: 1.000s
+      percent: 5

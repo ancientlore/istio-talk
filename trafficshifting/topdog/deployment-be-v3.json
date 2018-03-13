@@ -1,0 +1,40 @@
+{
+	"containers": [
+		{
+			"name": "topdog",
+			"image": "ancientlore/topdog:v0.1",
+			"port": 5000,
+			"mincpu": "50m",
+			"maxcpu": "100m",
+			"minmem": "20Mi",
+			"maxmem": "50Mi",
+			"env": [
+				{ "name": "VERSION", "value": "3" }
+			]
+		}
+	],
+	"name": "topdogbe",
+	"targetGroup": "v3",
+	"version": "v3",
+	"targetPort": 5000,
+	"locations": [
+		{
+			"name": "awsqa"
+		},
+		{
+			"name": "minikube"
+		}
+	],
+    "clusters": 1,
+    "replicas": 1,
+	"user": "${KUBE_USER}",
+	"token": "${KUBE_TOKEN}",
+	"namespace": "${KUBE_NAMESPACE}",
+	"loadBalanced": false,
+	"autodeploy": true,
+	"deploymentStrategy": "fast",
+	"healthCheck": "tcp",
+	"owner": "${KUBE_OWNER}",
+	"istio": true,
+	"type": "deployments"
+}

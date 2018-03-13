@@ -1,0 +1,36 @@
+apiVersion: config.istio.io/v1alpha2
+kind: RouteRule
+metadata:
+  name: topdogui-default
+spec:
+  ## Used by services inside the Kubernetes cluster
+  destination:
+    name: topdogui
+  precedence: 1
+  route:
+  - labels:
+      version: v1
+---
+apiVersion: config.istio.io/v1alpha2
+kind: RouteRule
+metadata:
+  name: topdogmt-default
+spec:
+  destination:
+    name: topdogmt
+  precedence: 1
+  route:
+  - labels:
+      version: v1
+---
+apiVersion: config.istio.io/v1alpha2
+kind: RouteRule
+metadata:
+  name: topdogbe-default
+spec:
+  destination:
+    name: topdogbe
+  precedence: 1
+  route:
+  - labels:
+      version: v1

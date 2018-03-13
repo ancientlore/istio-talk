@@ -1,0 +1,42 @@
+{
+    "type": "routerules",
+    "name": "webnull-test-bigdelay",
+    "locations": [
+        {
+            "name": "awsqa"
+        }
+    ],
+	"user": "${KUBE_USER}",
+    "token": "${KUBE_TOKEN}",
+    "namespace": "${KUBE_NAMESPACE}",
+    "k8s": {
+        "spec": {
+            "destination": {
+                "name": "webnull"
+            }, 
+            "precedence": 4,
+            "route": [
+                {
+                    "labels": {
+                        "service": "webnull"
+                    }
+                }
+            ],
+            "match": {
+                "request": {
+                    "headers": {
+                        "method": {
+                            "exact": "GET"
+                        }
+                    }
+                }
+            },
+            "httpFault": {
+                "delay": {
+                    "fixedDelay": "4s",
+                    "percent": 25
+                }
+            }
+        }
+    }
+}
