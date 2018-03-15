@@ -1,0 +1,34 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hurl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hurl
+  strategy:
+    rollingUpdate:
+      maxSurge: 60%
+      maxUnavailable: 30%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: hurl
+        service: hurl
+    spec:
+      containers:
+      - env:
+        - name: HURL_DISCARD
+          value: "true"
+        - name: HURL_CPU
+          value: "1"
+        image: ancientlore/hurl:0.1
+        imagePullPolicy: Always
+        name: hurl
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+      restartPolicy: Always
+      schedulerName: default-scheduler

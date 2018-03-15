@@ -12,22 +12,11 @@ What is great about [Istio] is that these functions are part of the _infrastruct
 
 Export the following variables which are used by the commands in this demo:
 
-* `KUBE_USER` - The Kubernetes user (like `minikube`, but use yours).
-* `KUBE_TOKEN` - The Kubernetes token.
 * `KUBE_NAMESPACE` - The Kubernetes namespace to deploy to (like `default`, but use yours).
-* `KUBE_OWNER` - The owner.
 
-> Note: Export a variable using, for example, `export KUBE_USER=my-kubernetes-user`, or assign it when calling the script like `KUBE_USER=my-kubernetes-user ./deploy.sh`.
+> Note: Export a variable using, for example, `export KUBE_NAMESPACE=my-kubernetes-namespace`, or assign it when calling the script like `KUBE_NAMESPACE=my-kubernetes-namespace ./deploy.sh`.
 
-Deploy [webnull] according to its [instructions](webnull/README.md):
-
-    $ cd webnull
-    $ ./deploy.sh
-
-Then deploy [hurl] according to its [instructions](hurl/README.md):
-
-    $ cd hurl
-    $ ./deploy.sh
+Deploy [webnull] according to its [instructions](webnull/README.md). Then deploy [hurl] according to its [instructions](hurl/README.md). Be sure to install the version that injects the [Istio] sidecar.
 
 Make sure the containers are running:
 
@@ -43,12 +32,6 @@ Set up the route rules for each service, and the circuit breaker destination pol
     $ istioctl create -f circuit-breaker.yaml --namespace=$KUBE_NAMESPACE
 
 > Note that you can generally use `kubectl` instead of `istioctl`, but `istioctl` provides additional client-side validation.
-
-Or, if you prefer the Skipper version (see the [instructions](istio/README.md)):
-
-    $ cd istio
-    $ ./deploy-object.sh route-rule-webnull.json route-rule-hurl.json
-    $ ./deploy-object.sh circuit-breaker.json
 
 You can check the route rules using `istioctl get routerules` or `kubectl get routerules`. You can also fetch an individual rule using:
 
@@ -86,8 +69,6 @@ Also, we have a [circuit breaker](istio/circuit-breaker.yaml) set up:
 
 At this point, the service is "operating normally".
 
-For the rest of the demo, you can use `istioctl` commands or scripts that post to [Skipper].
-
 > See region A on the diagram below
 
 ## Circuit Breaker
@@ -114,10 +95,6 @@ Next, we will inject [faults](istio/inject-abort.yaml) into the system.
 
     $ istioctl create -f inject-abort.yaml --namespace=$KUBE_NAMESPACE
 
-Skipper version:
-
-    $ ./deploy-object.sh inject-abort.json
-
 Note the HTTP 400 responses from the fault. This can be used to test how upstream services respond to failures.
 
 > See region D on the diagram below
@@ -125,10 +102,6 @@ Note the HTTP 400 responses from the fault. This can be used to test how upstrea
 Now remove the fault:
 
     $ istioctl delete routerule webnull-test-abort --namespace=$KUBE_NAMESPACE
-
-Skipper version:
-
-    $ ./delete-rule.sh webnull-test-abort
 
 Note how the service returns to normal.
 
@@ -140,10 +113,6 @@ We will now inject a [small delay](istio/inject-delay.yaml) into some percentage
 
     $ istioctl create -f inject-delay.yaml --namespace=$KUBE_NAMESPACE
 
-Skipper version:
-
-    $ ./deploy-object.sh inject-delay.json
-
 Note that even with this small delay, the service doesn't process as many transactions.
 
 > See region F on the diagram below
@@ -151,10 +120,6 @@ Note that even with this small delay, the service doesn't process as many transa
 Remove the small delay:
 
     $ istioctl delete routerule webnull-test-delay --namespace=$KUBE_NAMESPACE
-
-Skipper version:
-
-    $ ./delete-rule.sh webnull-test-delay
 
 Note the service return to normal.
 
@@ -165,10 +130,6 @@ Note the service return to normal.
 Now let's inject a [larger delay](istio/inject-big-delay.yaml) on more requests, simulating a potential database performance issue.
 
     $ istioctl create -f inject-big-delay.yaml --namespace=$KUBE_NAMESPACE
-
-Skipper version:
-
-    $ ./deploy-object.sh inject-big-delay.json
 
 Note how the service practically falls over.
 
@@ -185,10 +146,6 @@ Note that the service improves, but is still hurting. In some cases it might als
 "Fix the database" and remove the delay.
 
     $ istioctl delete routerule webnull-test-bigdelay --namespace=$KUBE_NAMESPACE
-
-Skipper version:
-
-    $ ./delete-rule.sh webnull-test-bigdelay
 
 Now the circuit breaker is triggering - why? The reason is that we still have many requests going.
 
@@ -212,10 +169,6 @@ Next, set up the [request timeout](istio/request-timeout.yaml) route rule.
 
     $ istioctl create -f request-timeout.yaml --namespace=$KUBE_NAMESPACE
 
-Skipper version:
-
-    $ ./deploy-object.sh request-timeout.json
-
 Wait a moment for the Istio proxy to update, then try the request again:
 
     # hurl http://webnull:8080/delay/5000
@@ -224,10 +177,6 @@ Wait a moment for the Istio proxy to update, then try the request again:
 Clean up the rule:
 
     $ istioctl delete routerule webnull-request-timeout --namespace=$KUBE_NAMESPACE
-
-Skipper version:
-
-    $ ./delete-rule.sh webnull-request-timeout
 
 ## Diagram
 
@@ -246,4 +195,3 @@ Skipper version:
 [hurl]: https://hurl-default.192.168.99.100.xip.io/
 [Istio]: https://istio.io/
 [curl]: https://curl.haxx.se/
-[Skipper]: https://github.com/concur/skipper

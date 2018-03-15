@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: webnull
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webnull
+  strategy:
+    rollingUpdate:
+      maxSurge: 60%
+      maxUnavailable: 30%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: webnull
+        service: webnull
+    spec:
+      containers:
+      - env:
+        - name: WEBNULL_CPU
+          value: "1"
+        image: ancientlore/webnull:0.1
+        imagePullPolicy: Always
+        name: webnull
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      restartPolicy: Always
+      schedulerName: default-scheduler
