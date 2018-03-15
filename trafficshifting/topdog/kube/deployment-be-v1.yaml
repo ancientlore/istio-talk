@@ -1,0 +1,57 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: topdogbe-v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: topdogbe
+      service: topdogbe
+      group: v1
+  strategy:
+    rollingUpdate:
+      maxSurge: 60%
+      maxUnavailable: 30%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: topdogbe
+        version: v1
+        service: topdogbe
+        group: v1
+    spec:
+      containers:
+      - env:
+        - name: VERSION
+          value: "1"
+        image: ancientlore/topdog:0.1.1
+        imagePullPolicy: Always
+        name: topdog
+        ports:
+        - containerPort: 5000
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /backend
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      restartPolicy: Always
+      schedulerName: default-scheduler
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: topdogbe
+spec:
+  ports:
+  - port: 5000
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: topdogbe
+    service: topdogbe
+  sessionAffinity: None
+  type: ClusterIP

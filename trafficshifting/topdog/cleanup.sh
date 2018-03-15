@@ -11,4 +11,4 @@ kubectl delete all -l service=topdogbe
 kubectl delete service topdogui
 kubectl delete service topdogmt
 kubectl delete service topdogbe
-kubectl delete ingress topdogui
+# kubectl delete ingress topdogui
