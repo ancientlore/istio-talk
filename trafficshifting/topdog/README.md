@@ -32,13 +32,17 @@ The deployment includes three versions of the backend. Ordinarily, you would not
 
 ## Deployment
 
-To deploy the [topdog] container without [Istio], run:
+To deploy the [topdog] container without [Istio] *or* if you have Istio automatic sidecar injection enabled, run:
 
     $ kubectl apply -f ./kube/
 
-To deploy the [topdog] container with [Istio], run:
+To deploy the [topdog] containers with [Istio] and automatic sidecar injection is not enabled, run:
 
-    $ kubectl apply -f <(~istioctl kube-inject -f ./kube/)
+    $ kubectl apply -f <(istioctl kube-inject -f ./kube/deployment-be-v1.yaml)
+    $ kubectl apply -f <(istioctl kube-inject -f ./kube/deployment-be-v2.yaml)
+    $ kubectl apply -f <(istioctl kube-inject -f ./kube/deployment-be-v3.yaml)
+    $ kubectl apply -f <(istioctl kube-inject -f ./kube/deployment-mt-v1.yaml)
+    $ kubectl apply -f <(istioctl kube-inject -f ./kube/deployment-ui-v1.yaml)
 
 You can check the UI by using a port-forward and then browsing to http://localhost:5000/status.
 

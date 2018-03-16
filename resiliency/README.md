@@ -22,7 +22,7 @@ Export the following variables which are used by the commands in this demo:
 
 * `KUBE_NAMESPACE` - The Kubernetes namespace to deploy to (like `default`, but use yours).
 
-> Note: Export a variable using, for example, `export KUBE_NAMESPACE=my-kubernetes-namespace`, or assign it when calling the script like `KUBE_NAMESPACE=my-kubernetes-namespace ./deploy.sh`.
+> Note: Export a variable using, for example, `export KUBE_NAMESPACE=my-kubernetes-namespace`, or assign it when calling the script like `KUBE_NAMESPACE=my-kubernetes-namespace ./script.sh`.
 
 Deploy [webnull] according to its [instructions](webnull/README.md). Then deploy [hurl] according to its [instructions](hurl/README.md). Be sure to install the version that injects the [Istio] sidecar.
 

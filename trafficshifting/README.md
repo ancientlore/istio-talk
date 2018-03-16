@@ -24,7 +24,7 @@ Export the following variables which are used by the commands in this demo:
 
 * `KUBE_NAMESPACE` - The Kubernetes namespace to deploy to (like `default`, but use yours).
 
-> Note: Export a variable using, for example, `export KUBE_NAMESPACE=my-kubernetes-namespace`, or assign it when calling the script like `KUBE_NAMESPACE=my-kubernetes-namespace ./deploy.sh *.json`.
+> Note: Export a variable using, for example, `export KUBE_NAMESPACE=my-kubernetes-namespace`, or assign it when calling the script like `KUBE_NAMESPACE=my-kubernetes-namespace ./script.sh *.json`.
 
 Deploy [topdog] according to its [instructions](topdog/README.md). Be sure to install the version that injects the [Istio] sidecar.
 
