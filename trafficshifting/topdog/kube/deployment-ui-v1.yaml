@@ -34,12 +34,6 @@ spec:
         ports:
         - containerPort: 5000
           protocol: TCP
-        livenessProbe:
-          httpGet:
-            path: /backend
-            port: 5000
-          initialDelaySeconds: 5
-          periodSeconds: 10
       restartPolicy: Always
       schedulerName: default-scheduler
 ---
