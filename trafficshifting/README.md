@@ -10,21 +10,23 @@ The demo is based on a simple application called [topdog]. [topdog] has three ti
 
 > Note: These instructions assume a `bash` shell. On Windows, you can use `git-bash` which should be installed with [git](https://git-scm.com/).
 
+## Requirements
+
+For this demo you need:
+
+* A Kubernetes cluster (or [Minikube]) with [Istio] installed.
+* The [kubectl command](https://kubernetes.io/docs/tasks/tools/install-kubectl/) should be installed.
+* Optionally, the [istioctl command](https://istio.io/docs/reference/commands/istioctl) can be used.
+
 ## Setup
 
 Export the following variables which are used by the commands in this demo:
 
-* `KUBE_USER` - The Kubernetes user (like `minikube`, but use yours).
-* `KUBE_TOKEN` - The Kubernetes token.
 * `KUBE_NAMESPACE` - The Kubernetes namespace to deploy to (like `default`, but use yours).
-* `KUBE_OWNER` - The owner.
 
-> Note: Export a variable using, for example, `export KUBE_USER=my-kubernetes-user`, or assign it when calling the script like `KUBE_USER=my-kubernetes-user ./deploy.sh *.json`.
+> Note: Export a variable using, for example, `export KUBE_NAMESPACE=my-kubernetes-namespace`, or assign it when calling the script like `KUBE_NAMESPACE=my-kubernetes-namespace ./deploy.sh *.json`.
 
-Deploy [topdog] according to its [instructions](topdog/README.md):
-
-    $ cd topdog
-    $ ./deploy.sh *.json
+Deploy [topdog] according to its [instructions](topdog/README.md). Be sure to install the version that injects the [Istio] sidecar.
 
 Make sure the containers are running:
 
@@ -44,11 +46,6 @@ Set up the route rules for each service:
     $ istioctl create -f route-rule-all-v1.yaml --namespace=$KUBE_NAMESPACE
 
 > Note that you can generally use `kubectl` instead of `istioctl`, but `istioctl` provides additional client-side validation.
-
-Or, if you prefer the Skipper version (see the [instructions](istio/README.md)):
-
-    $ cd istio
-    $ ./deploy-object.sh route-rule-ui-v1.json route-rule-mt-v1.json route-rule-be-v1.json
 
 You can check the route rules using `istioctl get routerules` or `kubectl get routerules`. You can also fetch an individual rule using:
 
@@ -70,10 +67,6 @@ We start out with a [default set of routerules](istio/route-rule-all-v1.yaml).
 
     $ istioctl create -f route-rule-all-v1.yaml --namespace=$KUBE_NAMESPACE
 
-Skipper version:
-
-    $ ./deploy-object.sh route-rule-ui-v1.json  route-rule-mt-v1.json  route-rule-be-v1.json
-
 These rules pass all traffic to the `v1` version of the services.
 
 ## First Version
@@ -86,10 +79,6 @@ Someone on the team decided to fix this. Let's test their version, routing traff
 
     $ istioctl create -f route-rule-be-v1-v2.yaml --namespace=$KUBE_NAMESPACE
 
-Skipper version:
-
-    $ ./deploy-object.sh route-rule-be-v1-v2.json
-
 Because [this route rule](istio/route-rule-be-v1-v2.yaml) is at a higher priority, it will apply to requests to the backend service.
 
 ## Second Version
@@ -98,19 +87,10 @@ The second version fixed the original bug, but it introduced occasional failures
 
     $ istioctl create -f route-rule-mt-retry.yaml --namespace=$KUBE_NAMESPACE
 
-Skipper version:
-
-    $ ./deploy-object.sh route-rule-mt-retry.json
-
 The [retry rule](istio/route-rule-mt-retry.yaml) fixes the problems, so we're going to move all the traffic to `v2` by [replacing the route rule](istio/route-rule-be-v2.yaml) and deleting the 50/50 rule.
     
     $ istioctl replace -f route-rule-be-v2.yaml --namespace=$KUBE_NAMESPACE
     $ istioctl delete routerule topdogbe-shift --namespace=$KUBE_NAMESPACE
-
-Skipper version:
-
-    $ ./deploy-object.sh route-rule-be-v2.json
-    $ ./delete-rule.sh topdogbe-shift
 
 ## Third Version
 
@@ -118,19 +98,10 @@ Now another team member decided that we really should fix the problem, even thou
 
     $ istioctl create -f route-rule-be-v2-v3.yaml --namespace=$KUBE_NAMESPACE
 
-Skipper version:
-
-    $ ./deploy-object.sh route-rule-be-v2-v3.json
-
 That seems to look good, so we'll route all the traffic to `v3` by [replacing the route rule](istio/route-rule-be-v3.yaml) and deleting the 50/50 rule.
 
     $ istioctl replace -f route-rule-be-v3.yaml --namespace=$KUBE_NAMESPACE
     $ istioctl delete routerule topdogbe-shift --namespace=$KUBE_NAMESPACE
-
-Skipper version:
-
-    $ ./deploy-object.sh route-rule-be-v3.json
-    $ ./delete-rule.sh topdogbe-shift
 
 Do the results still seem skewed?
 
@@ -138,3 +109,4 @@ Do the results still seem skewed?
 [topdog]: https://github.com/ancientlore/topdog
 [topdog UI]: https://topdogui-default.192.168.99.100.xip.io/
 [Docker]: https://www.docker.com/
+[Minikube]: https://github.com/kubernetes/minikube

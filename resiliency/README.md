@@ -8,6 +8,14 @@ What is great about [Istio] is that these functions are part of the _infrastruct
 
 > Note: These instructions assume a `bash` shell. On Windows, you can use `git-bash` which should be installed with [git](https://git-scm.com/).
 
+## Requirements
+
+For this demo you need:
+
+* A Kubernetes cluster (or [Minikube]) with [Istio] installed.
+* The [kubectl command](https://kubernetes.io/docs/tasks/tools/install-kubectl/) should be installed.
+* Optionally, the [istioctl command](https://istio.io/docs/reference/commands/istioctl) can be used.
+
 ## Setup
 
 Export the following variables which are used by the commands in this demo:
