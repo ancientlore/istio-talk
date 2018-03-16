@@ -4,7 +4,7 @@ This demo shows a mock service, [webnull], that just throws away requests. Anoth
 
 ![service diagram](resiliency.png)
 
-What is great about [Istio] is that these functions are part of the _infrastructure_ - no special coding is needed in [hurl] or [webnull] to take advantage of these features. [Istio] also has a great [dashboard](https://grafana.192.168.99.100.xip.io/dashboard/db/istio-dashboard), a [service graph](https://servicegraph.192.168.99.100.xip.io/dotviz?filter_empty=true&time_horizon=10m), and a [trace analyzer](https://zipkin.192.168.99.100.xip.io/zipkin/).
+What is great about [Istio] is that these functions are part of the _infrastructure_ - no special coding is needed in [hurl] or [webnull] to take advantage of these features. [Istio] also has a great dashboard, a service graph, and a trace analyzer.
 
 > Note: These instructions assume a `bash` shell. On Windows, you can use `git-bash` which should be installed with [git](https://git-scm.com/).
 
@@ -36,19 +36,19 @@ Make sure the containers are running:
 Set up the route rules for each service, and the circuit breaker destination policy:
 
     $ cd istio
-    $ istioctl create -f route-rule.yaml --namespace=$KUBE_NAMESPACE
-    $ istioctl create -f circuit-breaker.yaml --namespace=$KUBE_NAMESPACE
+    $ istioctl create -f route-rule.yaml -n $KUBE_NAMESPACE
+    $ istioctl create -f circuit-breaker.yaml -n $KUBE_NAMESPACE
 
 > Note that you can generally use `kubectl` instead of `istioctl`, but `istioctl` provides additional client-side validation.
 
 You can check the route rules using `istioctl get routerules` or `kubectl get routerules`. You can also fetch an individual rule using:
 
-    $ istioctl get routerule webnull-default --namespace=$KUBE_NAMESPACE -o yaml
-    $ istioctl get routerule hurl-default --namespace=$KUBE_NAMESPACE -o yaml
+    $ istioctl get routerule webnull-default -n $KUBE_NAMESPACE -o yaml
+    $ istioctl get routerule hurl-default -n $KUBE_NAMESPACE -o yaml
 
 Similarly, you can get destination policies using `istioctl get destinationpolicies` or fetch an individual one:
 
-    $ istioctl get destinationpolicy webnull-circuit-breaker --namespace=$KUBE_NAMESPACE -o yaml
+    $ istioctl get destinationpolicy webnull-circuit-breaker -n $KUBE_NAMESPACE -o yaml
 
 You're now ready to proceed with the demo.
 
@@ -69,11 +69,11 @@ Now look at the [hurl] dashboard. [hurl] was created to work similarly to [curl]
 
 We have already set up a [default routerule](istio/route-rule.yaml) in [Istio]:
 
-    $ istioctl get routerule webnull-default --namespace=$KUBE_NAMESPACE -o yaml
+    $ istioctl get routerule webnull-default -n $KUBE_NAMESPACE -o yaml
 
 Also, we have a [circuit breaker](istio/circuit-breaker.yaml) set up:
 
-    $ istioctl get destinationpolicy webnull-circuit-breaker --namespace=$KUBE_NAMESPACE -o yaml
+    $ istioctl get destinationpolicy webnull-circuit-breaker -n $KUBE_NAMESPACE -o yaml
 
 At this point, the service is "operating normally".
 
@@ -101,7 +101,7 @@ Things return to normal, although [Istio] may still have the circuit breaker tri
 
 Next, we will inject [faults](istio/inject-abort.yaml) into the system.
 
-    $ istioctl create -f inject-abort.yaml --namespace=$KUBE_NAMESPACE
+    $ istioctl create -f inject-abort.yaml -n $KUBE_NAMESPACE
 
 Note the HTTP 400 responses from the fault. This can be used to test how upstream services respond to failures.
 
@@ -109,7 +109,7 @@ Note the HTTP 400 responses from the fault. This can be used to test how upstrea
 
 Now remove the fault:
 
-    $ istioctl delete routerule webnull-test-abort --namespace=$KUBE_NAMESPACE
+    $ istioctl delete routerule webnull-test-abort -n $KUBE_NAMESPACE
 
 Note how the service returns to normal.
 
@@ -119,7 +119,7 @@ Note how the service returns to normal.
 
 We will now inject a [small delay](istio/inject-delay.yaml) into some percentage of the requests.
 
-    $ istioctl create -f inject-delay.yaml --namespace=$KUBE_NAMESPACE
+    $ istioctl create -f inject-delay.yaml -n $KUBE_NAMESPACE
 
 Note that even with this small delay, the service doesn't process as many transactions.
 
@@ -127,7 +127,7 @@ Note that even with this small delay, the service doesn't process as many transa
 
 Remove the small delay:
 
-    $ istioctl delete routerule webnull-test-delay --namespace=$KUBE_NAMESPACE
+    $ istioctl delete routerule webnull-test-delay -n $KUBE_NAMESPACE
 
 Note the service return to normal.
 
@@ -137,7 +137,7 @@ Note the service return to normal.
 
 Now let's inject a [larger delay](istio/inject-big-delay.yaml) on more requests, simulating a potential database performance issue.
 
-    $ istioctl create -f inject-big-delay.yaml --namespace=$KUBE_NAMESPACE
+    $ istioctl create -f inject-big-delay.yaml -n $KUBE_NAMESPACE
 
 Note how the service practically falls over.
 
@@ -153,7 +153,7 @@ Note that the service improves, but is still hurting. In some cases it might als
 
 "Fix the database" and remove the delay.
 
-    $ istioctl delete routerule webnull-test-bigdelay --namespace=$KUBE_NAMESPACE
+    $ istioctl delete routerule webnull-test-bigdelay -n $KUBE_NAMESPACE
 
 Now the circuit breaker is triggering - why? The reason is that we still have many requests going.
 
@@ -175,7 +175,7 @@ To test request timeouts, first try a long-running page without a timeout in pla
 
 Next, set up the [request timeout](istio/request-timeout.yaml) route rule.
 
-    $ istioctl create -f request-timeout.yaml --namespace=$KUBE_NAMESPACE
+    $ istioctl create -f request-timeout.yaml -n $KUBE_NAMESPACE
 
 Wait a moment for the Istio proxy to update, then try the request again:
 
@@ -184,7 +184,7 @@ Wait a moment for the Istio proxy to update, then try the request again:
 
 Clean up the rule:
 
-    $ istioctl delete routerule webnull-request-timeout --namespace=$KUBE_NAMESPACE
+    $ istioctl delete routerule webnull-request-timeout -n $KUBE_NAMESPACE
 
 ## Diagram
 
@@ -199,7 +199,7 @@ Clean up the rule:
 * [Istio] can be extended to services outside of Kubernetes.
 * [Istio] includes much more, including mutual TLS between services, throttling, and monitoring.
 
-[webnull]: https://webnull-default.192.168.99.100.xip.io/status/
-[hurl]: https://hurl-default.192.168.99.100.xip.io/
+[webnull]: https://github.com/ancientlore/webnull
+[hurl]: https://github.com/ancientlore/hurl
 [Istio]: https://istio.io/
 [curl]: https://curl.haxx.se/

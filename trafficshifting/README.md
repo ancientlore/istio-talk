@@ -2,9 +2,9 @@
 
 This project demonstrates how traffic can be shifted between different versions of a service. It also shows how to retry requests using [Istio].
 
-What is great about [Istio] is that these functions are part of the _infrastructure_ - no special coding is needed to take advantage of these features. [Istio] also has a great [dashboard](https://grafana.192.168.99.100.xip.io/dashboard/db/istio-dashboard), a [service graph](https://servicegraph.192.168.99.100.xip.io/dotviz?filter_empty=true&time_horizon=10m), and a [trace analyzer](https://zipkin.192.168.99.100.xip.io/zipkin/).
+What is great about [Istio] is that these functions are part of the _infrastructure_ - no special coding is needed to take advantage of these features. [Istio] also has a great dashboard, a service graph, and a trace analyzer.
 
-The demo is based on a simple application called [topdog]. [topdog] has three tiers - a UI, a middle tier, and a backend tier. All three are served the same [Docker] image, for simplicity. Check out the [topdog UI].
+The demo is based on a simple application called [topdog]. [topdog] has three tiers - a UI, a middle tier, and a backend tier. All three are served the same [Docker] image, for simplicity.
 
 ![topdog tiers](topdog/topdog.png)
 
@@ -43,15 +43,15 @@ Make sure the containers are running:
 Set up the route rules for each service:
 
     $ cd istio
-    $ istioctl create -f route-rule-all-v1.yaml --namespace=$KUBE_NAMESPACE
+    $ istioctl create -f route-rule-all-v1.yaml -n $KUBE_NAMESPACE
 
 > Note that you can generally use `kubectl` instead of `istioctl`, but `istioctl` provides additional client-side validation.
 
 You can check the route rules using `istioctl get routerules` or `kubectl get routerules`. You can also fetch an individual rule using:
 
-    $ istioctl get routerule topdogui-default --namespace=$KUBE_NAMESPACE -o yaml
-    $ istioctl get routerule topdogmt-default --namespace=$KUBE_NAMESPACE -o yaml
-    $ istioctl get routerule topdogbe-default --namespace=$KUBE_NAMESPACE -o yaml
+    $ istioctl get routerule topdogui-default -n $KUBE_NAMESPACE -o yaml
+    $ istioctl get routerule topdogmt-default -n $KUBE_NAMESPACE -o yaml
+    $ istioctl get routerule topdogbe-default -n $KUBE_NAMESPACE -o yaml
 
 You're now ready to proceed with the demo.
 
@@ -65,7 +65,7 @@ The [topdog] service has already been deployed, but if you need to deploy it see
 
 We start out with a [default set of routerules](istio/route-rule-all-v1.yaml).
 
-    $ istioctl create -f route-rule-all-v1.yaml --namespace=$KUBE_NAMESPACE
+    $ istioctl create -f route-rule-all-v1.yaml -n $KUBE_NAMESPACE
 
 These rules pass all traffic to the `v1` version of the services.
 
@@ -77,7 +77,7 @@ The first version works, but the results seem skewed to benefit the original dev
 
 Someone on the team decided to fix this. Let's test their version, routing traffic 50/50 between `v1` and `v2`.
 
-    $ istioctl create -f route-rule-be-v1-v2.yaml --namespace=$KUBE_NAMESPACE
+    $ istioctl create -f route-rule-be-v1-v2.yaml -n $KUBE_NAMESPACE
 
 Because [this route rule](istio/route-rule-be-v1-v2.yaml) is at a higher priority, it will apply to requests to the backend service.
 
@@ -85,28 +85,27 @@ Because [this route rule](istio/route-rule-be-v1-v2.yaml) is at a higher priorit
 
 The second version fixed the original bug, but it introduced occasional failures. We noticed that retrying the request works. So, we decided to add in retries using [Istio] rather than back out the new service. We can't let the original developer be the top dog.
 
-    $ istioctl create -f route-rule-mt-retry.yaml --namespace=$KUBE_NAMESPACE
+    $ istioctl create -f route-rule-mt-retry.yaml -n $KUBE_NAMESPACE
 
 The [retry rule](istio/route-rule-mt-retry.yaml) fixes the problems, so we're going to move all the traffic to `v2` by [replacing the route rule](istio/route-rule-be-v2.yaml) and deleting the 50/50 rule.
     
-    $ istioctl replace -f route-rule-be-v2.yaml --namespace=$KUBE_NAMESPACE
-    $ istioctl delete routerule topdogbe-shift --namespace=$KUBE_NAMESPACE
+    $ istioctl replace -f route-rule-be-v2.yaml -n $KUBE_NAMESPACE
+    $ istioctl delete routerule topdogbe-shift -n $KUBE_NAMESPACE
 
 ## Third Version
 
 Now another team member decided that we really should fix the problem, even though we have worked around the issue. So let's start moving traffic 50/50 between `v2` and `v3` using a [new rule](istio/route-rule-be-v2-v3.yaml).
 
-    $ istioctl create -f route-rule-be-v2-v3.yaml --namespace=$KUBE_NAMESPACE
+    $ istioctl create -f route-rule-be-v2-v3.yaml -n $KUBE_NAMESPACE
 
 That seems to look good, so we'll route all the traffic to `v3` by [replacing the route rule](istio/route-rule-be-v3.yaml) and deleting the 50/50 rule.
 
-    $ istioctl replace -f route-rule-be-v3.yaml --namespace=$KUBE_NAMESPACE
-    $ istioctl delete routerule topdogbe-shift --namespace=$KUBE_NAMESPACE
+    $ istioctl replace -f route-rule-be-v3.yaml -n $KUBE_NAMESPACE
+    $ istioctl delete routerule topdogbe-shift -n $KUBE_NAMESPACE
 
 Do the results still seem skewed?
 
 [Istio]: https://istio.io/
 [topdog]: https://github.com/ancientlore/topdog
-[topdog UI]: https://topdogui-default.192.168.99.100.xip.io/
 [Docker]: https://www.docker.com/
 [Minikube]: https://github.com/kubernetes/minikube
