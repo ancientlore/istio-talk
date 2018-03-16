@@ -86,11 +86,11 @@ In our tests, we'll typically use [hurl] to talk to the [webnull] container as f
 
 To deploy the [hurl] container without [Istio], run:
 
-    $ kubectl apply -f ./kube/
+    $ kubectl apply -f ./kube/deployment.yaml
 
 To deploy the [hurl] container with [Istio], run:
 
-    $ kubectl apply -f <(~istioctl kube-inject -f ./kube/)
+    $ kubectl apply -f <(~istioctl kube-inject -f ./kube/deployment.yaml)
 
 You can check the UI by using a port-forward and then browsing to http://localhost:8082/.
 

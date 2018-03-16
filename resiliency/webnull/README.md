@@ -21,11 +21,11 @@ By using [webnull], you can test networks or connectivity.
 
 To deploy the [webnull] container without [Istio], run:
 
-    $ kubectl apply -f ./kube/
+    $ kubectl apply -f ./kube/deployment.yaml
 
 To deploy the [webnull] container with [Istio], run:
 
-    $ kubectl apply -f <(~istioctl kube-inject -f ./kube/)
+    $ kubectl apply -f <(~istioctl kube-inject -f ./kube/deployment.yaml)
 
 You can check the UI by using a port-forward and then browsing to http://localhost:8081/status.
 

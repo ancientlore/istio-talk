@@ -32,3 +32,17 @@ spec:
           protocol: TCP
       restartPolicy: Always
       schedulerName: default-scheduler
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hurl
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: hurl
+  sessionAffinity: None
+  type: ClusterIP

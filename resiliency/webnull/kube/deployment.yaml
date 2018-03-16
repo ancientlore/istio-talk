@@ -36,3 +36,17 @@ spec:
           periodSeconds: 10
       restartPolicy: Always
       schedulerName: default-scheduler
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webnull
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: webnull
+  sessionAffinity: None
+  type: ClusterIP
