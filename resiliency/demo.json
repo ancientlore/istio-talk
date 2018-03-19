@@ -52,13 +52,13 @@
             "title": "Create some initial load",
             "desc": "Using 10 connections, hurl sends load to webnull.",
             "id": "kubeexec",
-            "input": "hurl -conns 10 -loop 2000000 http://webnull:8080/xml 2> /dev/null &"
+            "input": "hurl -conns 10 -loop 2000000 http://webnull:8080/xml 2> /dev/null & pid=$!"
         },
         {
             "title": "Test circuit breaker",
             "desc": "By bumping the connections to 100, we'll trigger the circuit breaker.",
             "id": "kubeexec",
-            "input": "kill -15 `pidof hurl`; hurl -conns 100 -loop 2000000 http://webnull:8080/xml 2> /dev/null &"
+            "input": "kill -15 $pid ; hurl -conns 100 -loop 2000000 http://webnull:8080/xml 2> /dev/null & pid=$!"
         },
         {
             "title": "Look at the circuit breaker policy",
@@ -70,7 +70,7 @@
             "title": "Return to normal load",
             "desc": "Restore the connections to 10.",
             "id": "kubeexec",
-            "input": "kill -15 `pidof hurl`; hurl -conns 10 -loop 2000000 http://webnull:8080/xml 2> /dev/null &"
+            "input": "kill -15 $pid ; hurl -conns 10 -loop 2000000 http://webnull:8080/xml 2> /dev/null & pid=$!"
         },
         {
             "title": "Test fault injection",
@@ -118,7 +118,7 @@
             "title": "Increase load",
             "desc": "To be realistic, requests would back up, increasing the connections.",
             "id": "kubeexec",
-            "input": "kill -15 `pidof hurl`; hurl -conns 100 -loop 2000000 http://webnull:8080/xml 2> /dev/null &"
+            "input": "kill -15 $pid ; hurl -conns 100 -loop 2000000 http://webnull:8080/xml 2> /dev/null & pid=$!"
         },
         {
             "title": "Fix the delay",
@@ -130,13 +130,13 @@
             "title": "Connections should return to normal",
             "desc": "Though a bit artificial, we'll reduce the connections back to normal.",
             "id": "kubeexec",
-            "input": "kill -15 `pidof hurl`; hurl -conns 10 -loop 2000000 http://webnull:8080/xml 2> /dev/null &"
+            "input": "kill -15 $pid ; hurl -conns 10 -loop 2000000 http://webnull:8080/xml 2> /dev/null & pid=$!"
         },
         {
             "title": "Try a long request",
             "desc": "We're going to check on request timeouts, so let's try a long request.",
             "id": "kubeexec",
-            "input": "kill -15 `pidof hurl`; hurl http://webnull:8080/delay/5000"
+            "input": "kill -15 $pid ; hurl http://webnull:8080/delay/5000"
         },
         {
             "title": "Set up request timeout rule",
