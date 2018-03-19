@@ -97,6 +97,8 @@ You can check the UI by using a port-forward and then browsing to http://localho
     $ hp=`kubectl get pod -l service=hurl -o name | sed 's/^pods\///'`
     $ kubectl port-forward $hp 8082:8080
 
+> Note: The UI is only available while the `hurl` command is running.
+
 [hurl]: https://github.com/ancientlore/hurl
 [curl]: https://curl.haxx.se/
 [webnull]: https://github.com/ancientlore/webnull

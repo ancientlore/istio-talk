@@ -26,6 +26,8 @@ Export the following variables which are used by the commands in this demo:
 
 Deploy [webnull] according to its [instructions](webnull/README.md). Then deploy [hurl] according to its [instructions](hurl/README.md). Be sure to install the version that injects the [Istio] sidecar.
 
+> Note: The [hurl] user interface will not be available until the `hurl` command is running inside the container.
+
 Make sure the containers are running:
 
     $ kubectl get pods
@@ -59,11 +61,17 @@ Start [hurl] with a basic request set.
     $ kubectl exec -it $(kubectl get pod -l service=hurl -o name | sed 's/^pods\///') /bin/sh
     # hurl -conns 10 -loop 2000000 http://webnull:8080/xml
 
-> Stay logged into the [hurl] container so that you can exercise commands later.
+> Stay logged into the [hurl] container so that you can exercise commands later. In this walk-through, commands shown with `#` are executed in the hurl container, and commands shown with `$` are executed in your normal shell.
 
-Look at the [webnull] dashboard - it shows incoming request volume and bytes received if it was a POST or PUT. This small utility can be used to check what sort of throughput you could achieve, assuming your service had no actual work to do.
+Look at the [webnull] dashboard by running the command below (in a new shell) and browsing to http://localhost:8081/status/ - it shows incoming request volume and bytes received if it was a POST or PUT. This small utility can be used to check what sort of throughput you could achieve, assuming your service had no actual work to do.
 
-Now look at the [hurl] dashboard. [hurl] was created to work similarly to [curl], except that it sends requests in parallel to load up some other service. The dashboard shows graphs of response codes, bytes recieved, and request round-trip time. We will be using [hurl] to send load to [webnull], and then checking what happens when we exercise [Istio] features.
+    $ kubectl port-forward $(kubectl get pod -l service=webnull -o name | sed 's/^pods\///') 8081:8080
+
+Now look at the [hurl] dashboard by running the command below (in a new shell) and browsing to http://localhost:8082/. [hurl] was created to work similarly to [curl], except that it sends requests in parallel to load up some other service. The dashboard shows graphs of response codes, bytes recieved, and request round-trip time.
+
+    $ kubectl port-forward $(kubectl get pod -l service=hurl -o name | sed 's/^pods\///') 8082:8080
+
+We will be using [hurl] to send load to [webnull], and then checking what happens when we exercise [Istio] features.
 
 > Note: Run the [Istio] commands from the `istio` folder.
 

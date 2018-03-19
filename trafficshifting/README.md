@@ -61,9 +61,13 @@ You're now ready to proceed with the demo.
 
 The [topdog] service has already been deployed, but if you need to deploy it see the [instructions](topdog/README.md).
 
+View the user interface by running the following command (in a new shell) and then browsing to http://localhost:5000/.
+
+    $ kubectl port-forward $(kubectl get pod -l service=topdogui -o name | sed 's/^pods\///') 5000
+
 > Note: Run the [Istio] commands from the [istio](istio) subfolder.
 
-We start out with a [default set of routerules](istio/route-rule-all-v1.yaml).
+We start out with a [default set of routerules](istio/route-rule-all-v1.yaml) that we created earlier:
 
     $ istioctl create -f route-rule-all-v1.yaml -n $KUBE_NAMESPACE
 
