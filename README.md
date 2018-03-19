@@ -1,8 +1,6 @@
 # istio-talk
 
-This repository contains code for my talk on [Istio].
-
-> Stay tuned! I'm doing some work to run the demos more easily. I just moved it from our corporate environment.
+This repository contains demo code for my talk on [Istio].
 
 ## Resiliency Demo
 
@@ -10,11 +8,15 @@ See the [walk-through](resiliency/README.md).
 
 ![Resiliency Demo](resiliency_demo.png)
 
+To use my [demo tool], follow the setup instructions in the [walk-through](resiliency/README.md) and then run [startDemo.sh](resiliency/startDemo.sh) from the `resiliency` folder.
+
 ## Traffic Shifting Demo
 
 See the [walk-through](trafficshifting/README.md).
 
 ![Traffic Shifting Demo](trafficshifting_demo.png)
+
+To use my [demo tool], follow the setup instructions in the [walk-through](trafficshifting/README.md) and then run [startDemo.sh](trafficshifting/startDemo.sh) from the `trafficshifting` folder.
 
 ## Notes
 
@@ -33,3 +35,4 @@ These demos use other utilities I've created:
 [webnull Docker image]: https://hub.docker.com/r/ancientlore/webnull/
 [hURL Docker image]: https://hub.docker.com/r/ancientlore/hurl/
 [demon]: https://github.com/ancientlore/demon
+[demo tool]: https://github.com/ancientlore/demon
