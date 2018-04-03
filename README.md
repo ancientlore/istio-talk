@@ -6,7 +6,7 @@ This repository contains demo code for my talk on [Istio].
 
 See the [walk-through](resiliency/README.md).
 
-![Resiliency Demo](resiliency_demo.png)
+![Resiliency Demo](media/resiliency_demo.png)
 
 To use my [demo tool], follow the setup instructions in the [walk-through](resiliency/README.md) and then run [startDemo.sh](resiliency/startDemo.sh) from the `resiliency` folder.
 
@@ -14,7 +14,7 @@ To use my [demo tool], follow the setup instructions in the [walk-through](resil
 
 See the [walk-through](trafficshifting/README.md).
 
-![Traffic Shifting Demo](trafficshifting_demo.png)
+![Traffic Shifting Demo](media/trafficshifting_demo.png)
 
 To use my [demo tool], follow the setup instructions in the [walk-through](trafficshifting/README.md) and then run [startDemo.sh](trafficshifting/startDemo.sh) from the `trafficshifting` folder.
 
