@@ -1,0 +1,154 @@
+Istio
+Introducing the Service Mesh
+18:00 18 Apr 2018
+Tags: microservice, devops, kubernetes, istio, service-mesh, proxy, envoy
+
+Michael Lore
+Principal Architect, SAP Concur
+@ancientlore
+
+
+
+* About Me
+
+- Central Architecture Team at SAP Concur
+- Designed the booking engine powering Concur Travel
+- Playing with Go since 2010 (see [[https://github.com/ancientlore/go-avltree][go-avltree]])
+- Interested in concurrent applications in the travel space
+- ...which explains my interest in Go, microservices, and service mesh
+
+.image media/gopher.png
+
+[[https://twitter.com/ancientlore][@ancientlore]]
+
+.background media/plane_bg.png
+
+
+
+* Monolith to Microservices
+
+.image media/deathstar.jpg
+
+.caption Who isn't doing this?
+
+.background media/plane_bg.png
+
+
+
+* Simple, right?
+
+.image media/istio-talk-1.png
+
+.background media/plane_bg.png
+
+
+
+* Not so fast...
+
+.image media/istio-talk-2.png
+
+.background media/plane_bg.png
+
+
+
+* A polyglot world
+
+.image media/istio-talk-3.png
+
+.caption The microservices aren't so micro after all.
+
+.background media/plane_bg.png
+
+
+
+* Enter Istio: A Service Mesh
+
+.image media/istio-talk-4.png
+
+.background media/plane_bg.png
+
+
+
+* What is Istio?
+
+.link https://istio.io/
+
+A complete framework for *connecting*, *securing*, *managing*, and *monitoring* services
+
+Secure and monitor traffic for microservices *and* legacy services
+
+An *open*platform* with key contributions from Google, IBM, Lyft, and others
+
+*Multi-environment*and*multi-platform*, but Kubernetes first
+
+.image media/istio.png
+
+.background media/plane_bg.png
+
+
+
+* Powered by Envoy
+
+.link https://www.envoyproxy.io/
+A C++ based L4/L7 proxy created and battle-tested at Lyft
+
+- Dynamic service discovery
+- Load balancing and traffic splitting
+- TLS termination
+- HTTP/2 first, gRPC proxying
+- Circuit breakers and timeout handling
+- Health checks, fault and delay injection
+
+.image media/envoy.png
+
+.background media/plane_bg.png
+
+
+
+* Istio Architecture
+
+.image media/istio-talk-5.png
+
+.background media/plane_bg.png
+
+
+
+* Why are we interested in Istio?
+
+- [[https://www.eugdpr.org/][Global Data Protection Regulation (GDPR)]]
+- Zero-trust, automated mutual-TLS
+- Deployment and routing strategies (canary)
+- Circuit breakers, fault injection
+- Observability and tracing
+- Mesh expansion to legacy services
+- Consistency within a polyglot environment
+
+.image media/sap.png 32 _
+.caption SAP is a [[https://www.cncf.io/announcement/2017/10/11/cloud-native-computing-foundation-welcomes-sap-platinum-member/][Platinum Member]] of the CNCF.
+
+.background media/plane_bg.png
+
+
+
+* Demo - Traffic Shifting
+
+.image trafficshifting/trafficshifting.png
+
+.background media/plane_bg.png
+
+
+
+* Demo - Resiliency
+
+.image resiliency/resiliency.png
+
+.background media/plane_bg.png
+
+
+
+* Other good Istio Presentations
+
+- Ray Tsang (@saturnism), [[https://speakerdeck.com/saturnism/making-microservices-micro-with-istio-service-mesh][Making Microservices Micro]]
+- Matt Klein (@mattklein123), [[https://youtu.be/IeJDjq-COjk][The Mechanics of Deploying Envoy at Lyft]]
+
+.background media/plane_bg.png
