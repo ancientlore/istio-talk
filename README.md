@@ -2,6 +2,8 @@
 
 This repository contains demo code for my talk on [Istio].
 
+To view the slides, run Go's [present](https://godoc.org/golang.org/x/tools/present) tool from the project folder and select `istio-talk.slide`.
+
 ## Resiliency Demo
 
 See the [walk-through](resiliency/README.md).
