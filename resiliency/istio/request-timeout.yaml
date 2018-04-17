@@ -6,9 +6,6 @@ spec:
   destination:
     name: webnull
   precedence: 2
-  route:
-  - labels:
-      service: webnull
   httpReqTimeout:
     simpleTimeout:
       timeout: 3s

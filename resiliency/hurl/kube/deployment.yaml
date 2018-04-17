@@ -4,19 +4,10 @@ metadata:
   name: hurl
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: hurl
-  strategy:
-    rollingUpdate:
-      maxSurge: 60%
-      maxUnavailable: 30%
-    type: RollingUpdate
   template:
     metadata:
       labels:
         app: hurl
-        service: hurl
     spec:
       containers:
       - env:
@@ -29,20 +20,17 @@ spec:
         name: hurl
         ports:
         - containerPort: 8080
-          protocol: TCP
-      restartPolicy: Always
-      schedulerName: default-scheduler
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: hurl
+  labels:
+    app: hurl
 spec:
   ports:
   - port: 8080
-    protocol: TCP
+    name: http
     targetPort: 8080
   selector:
     app: hurl
-  sessionAffinity: None
-  type: ClusterIP

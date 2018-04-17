@@ -3,19 +3,10 @@ kind: RouteRule
 metadata:
   name: webnull-test-abort
 spec:
-  #
   destination:
     name: webnull
   precedence: 5
-  route:
-  - labels:
-      #version: 1.1.1
-      service: webnull
   match:
-    #source:
-    #  name: istio-ingress
-    #  labels:
-    #    istio: ingress
     request:
       headers:
         method:

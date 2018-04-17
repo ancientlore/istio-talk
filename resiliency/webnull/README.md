@@ -29,7 +29,7 @@ To deploy the [webnull] container with [Istio] and automatic sidecar injection i
 
 You can check the UI by using a port-forward and then browsing to http://localhost:8081/status.
 
-    $ wp=`kubectl get pod -l service=webnull -o name | sed 's/^pods\///'`
+    $ wp=`kubectl get pod -l app=webnull -o name | sed 's/^pods\///'`
     $ kubectl port-forward $wp 8081:8080
 
 [webnull]: https://github.com/ancientlore/webnull

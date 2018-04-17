@@ -3,20 +3,14 @@ kind: RouteRule
 metadata:
   name: webnull-test-bigdelay
 spec:
-  #
   destination:
     name: webnull
   precedence: 4
-  route:
-  - labels:
-      service: webnull
   match:
     request:
       headers:
         method:
           exact: GET
-        #uri:
-        #  prefix: /xml
   httpFault:
     delay:
       fixedDelay: 4.000s

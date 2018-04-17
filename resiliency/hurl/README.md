@@ -94,7 +94,7 @@ To deploy the [hurl] container with [Istio] and automatic sidecar injection is n
 
 You can check the UI by using a port-forward and then browsing to http://localhost:8082/.
 
-    $ hp=`kubectl get pod -l service=hurl -o name | sed 's/^pods\///'`
+    $ hp=`kubectl get pod -l app=hurl -o name | sed 's/^pods\///'`
     $ kubectl port-forward $hp 8082:8080
 
 > Note: The UI is only available while the `hurl` command is running.

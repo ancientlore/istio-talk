@@ -5,8 +5,6 @@ metadata:
 spec:
   destination:
     name: webnull
-    labels:
-      service: webnull
   circuitBreaker:
     simpleCb:
       maxConnections: 50

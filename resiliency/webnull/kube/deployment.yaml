@@ -4,19 +4,10 @@ metadata:
   name: webnull
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: webnull
-  strategy:
-    rollingUpdate:
-      maxSurge: 60%
-      maxUnavailable: 30%
-    type: RollingUpdate
   template:
     metadata:
       labels:
         app: webnull
-        service: webnull
     spec:
       containers:
       - env:
@@ -27,20 +18,17 @@ spec:
         name: webnull
         ports:
         - containerPort: 8080
-          protocol: TCP
-      restartPolicy: Always
-      schedulerName: default-scheduler
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: webnull
+  labels:
+    app: webnull
 spec:
   ports:
   - port: 8080
-    protocol: TCP
+    name: http
     targetPort: 8080
   selector:
     app: webnull
-  sessionAffinity: None
-  type: ClusterIP

@@ -10,13 +10,13 @@ w="http://localhost:8081/status/"
 h="http://localhost:8082/"
 
 # start port-forward
-wp=`kubectl get pod -l service=webnull -o name | sed 's/^pods\///'`
+wp=`kubectl get pod -l app=webnull -o name | sed 's/^pods\///'`
 kubectl port-forward $wp 8081:8080 &
 wpid=$!
 echo WEBNULL pod is $wp
 
 # start port-forward
-hp=`kubectl get pod -l service=hurl -o name | sed 's/^pods\///'`
+hp=`kubectl get pod -l app=hurl -o name | sed 's/^pods\///'`
 kubectl port-forward $hp 8082:8080 &
 hpid=$!
 echo HURL pod is $hp
