@@ -130,6 +130,51 @@ A C++ based L4/L7 proxy created and battle-tested at Lyft
 
 
 
+* Dashboard
+
+.image media/grafana.png _ 900
+
+.background media/plane_bg.png
+
+
+
+* Service Graph
+
+.image media/servicegraph.png _ 900
+
+.background media/plane_bg.png
+
+
+
+* Tracing
+
+.image media/zipkin.png _ 900
+
+.background media/plane_bg.png
+
+
+
+* Things you still need to do
+
+- Propagate headers between service calls ("x-request-id", "x-b3-traceid", "x-b3-spanid", "x-b3-parentspanid", "x-b3-sampled", "x-b3-flags", "x-ot-span-context")
+
+	for _, h := range headersToCopy {
+		val := fromReq.Header.Get(h)
+		if val != "" {
+			toReq.Header.Set(h, val)
+		}
+	}
+
+- Handle *504*Gateway*Timeout* from timeouts.
+- Handle *503*Service*Unavailable* from circuit breakers.
+- Tune circuit breakers.
+
+.caption Not totally free
+
+.background media/plane_bg.png
+
+
+
 * Demo - Traffic Shifting
 
 .image trafficshifting/trafficshifting.png
