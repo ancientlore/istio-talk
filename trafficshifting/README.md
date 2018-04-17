@@ -63,7 +63,7 @@ The [topdog] service has already been deployed, but if you need to deploy it see
 
 View the user interface by running the following command (in a new shell) and then browsing to http://localhost:5000/.
 
-    $ kubectl port-forward $(kubectl get pod -l service=topdogui -o name | sed 's/^pods\///') 5000
+    $ kubectl port-forward $(kubectl get pod -l app=topdogui -o name | sed 's/^pods\///') 5000
 
 > Note: Run the [Istio] commands from the [istio](istio) subfolder.
 
