@@ -9,7 +9,7 @@ echo KUBE_NAMESPACE is $ns
 t="http://localhost:8081"
 
 # start port-forward
-hp=`kubectl get pod -l service=topdogui -o name | sed 's/^pods\///'`
+hp=`kubectl get pod -l app=topdogui -o name | sed 's/^pods\///'`
 kubectl port-forward $hp 8081:5000 &
 hpid=$!
 echo TOPDOG pod is $hp

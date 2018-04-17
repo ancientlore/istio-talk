@@ -46,7 +46,7 @@ To deploy the [topdog] containers with [Istio] and automatic sidecar injection i
 
 You can check the UI by using a port-forward and then browsing to http://localhost:5000/.
 
-    $ hp=`kubectl get pod -l service=topdogui -o name | sed 's/^pods\///'`
+    $ hp=`kubectl get pod -l app=topdogui -o name | sed 's/^pods\///'`
     $ kubectl port-forward $hp 5000
 
 ## Brought to you by:

@@ -4,50 +4,36 @@ metadata:
   name: topdogmt-v1
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: topdogmt
-      service: topdogmt
-      group: v1
-  strategy:
-    rollingUpdate:
-      maxSurge: 60%
-      maxUnavailable: 30%
-    type: RollingUpdate
   template:
     metadata:
       labels:
         app: topdogmt
         version: v1
-        service: topdogmt
-        group: v1
     spec:
       containers:
       - env:
+        - name: VERSION
+          value: "1"
         - name: MIDTIER
           value: "http://topdogbe:5000"
         - name: BACKEND
           value: "http://topdogbe:5000"
         image: ancientlore/topdog:0.1.1
         imagePullPolicy: Always
-        name: topdog
+        name: topdogmt
         ports:
         - containerPort: 5000
-          protocol: TCP
-      restartPolicy: Always
-      schedulerName: default-scheduler
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: topdogmt
+  labels:
+    app: topdogmt
 spec:
   ports:
   - port: 5000
-    protocol: TCP
+    name: http
     targetPort: 5000
   selector:
     app: topdogmt
-    service: topdogmt
-  sessionAffinity: None
-  type: ClusterIP
