@@ -20,6 +20,7 @@ Principal Architect, SAP Concur
 .image media/gopher.png
 
 [[https://twitter.com/ancientlore][@ancientlore]]
+.link https://github.com/ancientlore/istio-talk
 
 .background media/plane_bg.png
 
@@ -87,6 +88,23 @@ An *open*platform* with key contributions from Google, IBM, Lyft, and others
 
 
 
+* Why are we interested in Istio?
+
+- [[https://www.eugdpr.org/][Global Data Protection Regulation (GDPR)]]
+- Zero-trust, automated mutual-TLS
+- Deployment and routing strategies (canary)
+- Circuit breakers, fault injection
+- Observability and tracing
+- Mesh expansion to legacy services
+- Consistency within a polyglot environment
+
+.image media/sap.png 32 _
+.caption SAP is a [[https://www.cncf.io/announcement/2017/10/11/cloud-native-computing-foundation-welcomes-sap-platinum-member/][Platinum Member]] of the CNCF.
+
+.background media/plane_bg.png
+
+
+
 * Powered by Envoy
 
 .link https://www.envoyproxy.io/
@@ -113,18 +131,21 @@ A C++ based L4/L7 proxy created and battle-tested at Lyft
 
 
 
-* Why are we interested in Istio?
+* Istio Resources
 
-- [[https://www.eugdpr.org/][Global Data Protection Regulation (GDPR)]]
-- Zero-trust, automated mutual-TLS
-- Deployment and routing strategies (canary)
-- Circuit breakers, fault injection
-- Observability and tracing
-- Mesh expansion to legacy services
-- Consistency within a polyglot environment
+Istio is configured via Kubernetes resources:
 
-.image media/sap.png 32 _
-.caption SAP is a [[https://www.cncf.io/announcement/2017/10/11/cloud-native-computing-foundation-welcomes-sap-platinum-member/][Platinum Member]] of the CNCF.
+- Route Rules
+- Destination Policies
+- Ingress/Egress Rules
+
+They are visible via `kubectl`:
+
+	kubectl get routerules
+
+You can also use `istioctl`, which provides better validation.
+
+	istioctl get destinationpolicies
 
 .background media/plane_bg.png
 
@@ -156,18 +177,20 @@ A C++ based L4/L7 proxy created and battle-tested at Lyft
 
 * Things you still need to do
 
-- Propagate headers between service calls ("x-request-id", "x-b3-traceid", "x-b3-spanid", "x-b3-parentspanid", "x-b3-sampled", "x-b3-flags", "x-ot-span-context")
+- Propagate headers between service calls.
 
+	headersToCopy := []string{"x-request-id", "x-b3-traceid", "x-b3-spanid", "x-b3-parentspanid",
+							  "x-b3-sampled", "x-b3-flags", "x-ot-span-context"}
 	for _, h := range headersToCopy {
-		val := fromReq.Header.Get(h)
+		val := fromRequest.Header.Get(h)
 		if val != "" {
-			toReq.Header.Set(h, val)
+			toRequest.Header.Set(h, val)
 		}
 	}
 
 - Handle *504*Gateway*Timeout* from timeouts.
-- Handle *503*Service*Unavailable* from circuit breakers.
-- Tune circuit breakers.
+- Handle *503*Service*Unavailable* from circuit breakers and _tune_them_.
+- Inject the proxy into your pods using `istioctl`kube-inject` or run the automatic injector.
 
 .caption Not totally free
 
@@ -191,9 +214,46 @@ A C++ based L4/L7 proxy created and battle-tested at Lyft
 
 
 
+* Issues we discovered
+
+.image media/bug.png _ 200
+
+- Istio is progressing rapidly, but is still alpha.
+- We encountered high CPU issues on larger clusters with many changes going on.
+- Proxies are not updated instantly - you have to be careful to avoid some communication issues while rules propagate to the envoy instances.
+- We have not tried mesh expansion - it looks like it needs to be flushed out further.
+
+.background media/plane_bg.png
+
+
+
 * Other good Istio Presentations
 
 - Ray Tsang (@saturnism), [[https://speakerdeck.com/saturnism/making-microservices-micro-with-istio-service-mesh][Making Microservices Micro]]
 - Matt Klein (@mattklein123), [[https://youtu.be/IeJDjq-COjk][The Mechanics of Deploying Envoy at Lyft]]
+
+.background media/plane_bg.png
+
+
+
+* Resources
+
+[[https://istio.io/][istio.io]]
+
+[[https://www.envoyproxy.io/][www.envoyproxy.io]]
+
+Quick start on GKE:
+[[https://istio.io/docs/setup/kubernetes/quick-start-gke-dm.html][istio.io/docs/setup/kubernetes/quick-start-gke-dm.html]]
+
+This presentation, Kubernetes deployments, Istio code:
+[[https://github.com/ancientlore/istio-talk][github.com/ancientlore/istio-talk]]
+
+Demo code:
+[[https://github.com/ancientlore/hurl][github.com/ancientlore/hurl]]
+[[https://github.com/ancientlore/webnull][github.com/ancientlore/webnull]]
+[[https://github.com/ancientlore/topdog][github.com/ancientlore/topdog]]
+
+Utility for showing the demos:
+[[https://github.com/ancientlore/demon][github.com/ancientlore/demon]]
 
 .background media/plane_bg.png
