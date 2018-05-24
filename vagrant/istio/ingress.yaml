@@ -1,0 +1,53 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: zipkin
+  namespace: istio-system
+spec:
+  rules:
+  - host: zipkin.192.168.99.101.xip.io
+    http:
+      paths:
+      - backend:
+          serviceName: zipkin
+          servicePort: 9411
+        path: /
+  tls:
+  - hosts:
+    - zipkin.192.168.99.101.xip.io
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: grafana
+  namespace: istio-system
+spec:
+  rules:
+  - host: grafana.192.168.99.101.xip.io
+    http:
+      paths:
+      - backend:
+          serviceName: grafana
+          servicePort: 3000
+        path: /
+  tls:
+  - hosts:
+    - grafana.192.168.99.101.xip.io
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: servicegraph
+  namespace: istio-system
+spec:
+  rules:
+  - host: servicegraph.192.168.99.101.xip.io
+    http:
+      paths:
+      - backend:
+          serviceName: servicegraph
+          servicePort: 8088
+        path: /
+  tls:
+  - hosts:
+    - servicegraph.192.168.99.101.xip.io
