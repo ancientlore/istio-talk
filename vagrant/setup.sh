@@ -97,7 +97,7 @@ wait_on_istio
 
 # ingress
 echo "*** INSTALLING ISTIO ADDONS INGRESS***"
-kubectl apply -f /vagrant/vagrant/istio/
+kubectl apply -f /vagrant/vagrant/istio/ingress.yaml
 sleep 5
 
 # k8s
@@ -119,6 +119,10 @@ kubectl apply -f <(istioctl kube-inject -f /vagrant/trafficshifting/topdog/kube/
 kubectl apply -f <(istioctl kube-inject -f /vagrant/trafficshifting/topdog/kube/deployment-be-v3.yaml)
 kubectl apply -f <(istioctl kube-inject -f /vagrant/trafficshifting/topdog/kube/deployment-mt-v1.yaml)
 kubectl apply -f <(istioctl kube-inject -f /vagrant/trafficshifting/topdog/kube/deployment-ui-v1.yaml)
+
+echo "*** INSTALLING DEMO INGRESS ***"
+kubectl apply -f /vagrant/vagrant/istio/demo-istio-ingress.yaml
+kubectl apply -f /vagrant/vagrant/istio/demo-nginx-ingress.yaml
 
 echo "*** ADDING ISTIO RULES ***"
 istioctl create -f /vagrant/trafficshifting/istio/route-rule-all-v1.yaml -n default
@@ -155,3 +159,5 @@ go get github.com/ancientlore/webnull
 go get github.com/ancientlore/demon
 go get github.com/ancientlore/topdog
 
+echo 'echo "NOTE:"' >> /home/vagrant/.profile
+echo 'echo "Run /vagrant/vagrant-demo.sh to start the demo."' >> /home/vagrant/.profile

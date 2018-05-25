@@ -12,9 +12,9 @@ spec:
           serviceName: zipkin
           servicePort: 9411
         path: /
-  tls:
-  - hosts:
-    - zipkin.192.168.99.101.xip.io
+#  tls:
+#  - hosts:
+#    - zipkin.192.168.99.101.xip.io
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -30,9 +30,9 @@ spec:
           serviceName: grafana
           servicePort: 3000
         path: /
-  tls:
-  - hosts:
-    - grafana.192.168.99.101.xip.io
+#  tls:
+#  - hosts:
+#    - grafana.192.168.99.101.xip.io
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -48,6 +48,6 @@ spec:
           serviceName: servicegraph
           servicePort: 8088
         path: /
-  tls:
-  - hosts:
-    - servicegraph.192.168.99.101.xip.io
+#  tls:
+#  - hosts:
+#    - servicegraph.192.168.99.101.xip.io

@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gateway
+  namespace: istio-system
+spec:
+  rules:
+  - host: topdog.192.168.99.101.xip.io
+    http:
+      paths:
+      - backend:
+          serviceName: istio-ingress
+          servicePort: 80
+        path: /
+  - host: hurl.192.168.99.101.xip.io
+    http:
+      paths:
+      - backend:
+          serviceName: istio-ingress
+          servicePort: 80
+        path: /
+  - host: webnull.192.168.99.101.xip.io
+    http:
+      paths:
+      - backend:
+          serviceName: istio-ingress
+          servicePort: 80
+        path: /
+#  tls:
+#  - hosts:
+#    - webnull.192.168.99.101.xip.io
+#    - hurl.192.168.99.101.xip.io
+#    - topdog.192.168.99.101.xip.io
