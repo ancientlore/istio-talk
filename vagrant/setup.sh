@@ -41,6 +41,7 @@ sudo apt-get upgrade -y
 # Installing Git
 sudo apt-get install -y git
 sudo apt-get install -y jq
+sudo apt-get install -y socat
 
 # Installing Docker
 echo "*** INSTALLING DOCKER ***"
