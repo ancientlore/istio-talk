@@ -20,6 +20,26 @@ See the [walk-through](trafficshifting/README.md).
 
 To use my [demo tool], follow the setup instructions in the [walk-through](trafficshifting/README.md) and then run [startDemo.sh](trafficshifting/startDemo.sh) from the `trafficshifting` folder.
 
+## Vagrant Version
+
+I've created a Vagrant version to make it easy to spin up an environment for running the demos. Pull this repository and then `vagrant up` and `vagrant ssh`. Then run the demo script from inside the box:
+
+    /vagrant/vagrant-demo.sh
+
+This will start the `present` tool on http://192.168.99.101:8080/ and the first demo (traffic shifting) on http://192.168.99.101:8081/. After showing the first demo, press return and the second demo (resiliency) will start on the same port. Press return again and the demo and `present` should stop.
+
+The Vagrant version also has the Istio tools available at:
+
+* http://zipkin.192.168.99.101.xip.io/zipkin
+* http://grafana.192.168.99.101.xip.io/
+* http://servicegraph.192.168.99.101.xip.io/dotviz
+
+And the demo pods can be reached directly at:
+
+* http://topdog.192.168.99.101.xip.io/
+* http://hurl.192.168.99.101.xip.io/
+* http://webnull.192.168.99.101.xip.io/status
+
 ## Notes
 
 These demos use other utilities I've created:
