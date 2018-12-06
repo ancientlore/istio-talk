@@ -13,7 +13,7 @@ spec:
       - env:
         - name: WEBNULL_CPU
           value: "1"
-        image: ancientlore/webnull:0.1
+        image: ancientlore/webnull:v0.1.1
         imagePullPolicy: Always
         name: webnull
         ports:

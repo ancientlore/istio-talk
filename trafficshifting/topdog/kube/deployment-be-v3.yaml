@@ -14,7 +14,7 @@ spec:
       - env:
         - name: VERSION
           value: "3"
-        image: ancientlore/topdog:0.1.1
+        image: ancientlore/topdog:v0.1.2
         imagePullPolicy: Always
         name: topdogbe
         ports:

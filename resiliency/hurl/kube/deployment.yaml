@@ -15,7 +15,7 @@ spec:
           value: "true"
         - name: HURL_CPU
           value: "1"
-        image: ancientlore/hurl:0.1
+        image: ancientlore/hurl:v0.1.1
         imagePullPolicy: Always
         name: hurl
         ports:
