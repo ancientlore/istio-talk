@@ -135,17 +135,18 @@ A C++ based L4/L7 proxy created and battle-tested at Lyft
 
 Istio is configured via Kubernetes resources:
 
-- Route Rules
-- Destination Policies
-- Ingress/Egress Rules
+- Virtual Services
+- Destination Rules
+- Service Entries
+- Gateways
 
 They are visible via `kubectl`:
 
-	kubectl get routerules
+	kubectl get virtualservices
 
 You can also use `istioctl`, which provides better validation.
 
-	istioctl get destinationpolicies
+	istioctl get destinationrules
 
 .background media/plane_bg.png
 
@@ -222,6 +223,8 @@ You can also use `istioctl`, which provides better validation.
 - We encountered high CPU issues on larger clusters with many changes going on.
 - Proxies are not updated instantly - you have to be careful to avoid some communication issues while rules propagate to the envoy instances.
 - We have not tried mesh expansion - it looks like it needs to be flushed out further.
+
+But with the release of 1.0, things are getting stable quickly.
 
 .background media/plane_bg.png
 
