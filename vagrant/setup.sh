@@ -3,34 +3,9 @@
 wait_on_istio ()
 {
 	# wait for istio
-	until kubectl get pods -n istio-system | grep '^istio-pilot.*Running'
+	until [ `kubectl get pods -n istio-system | egrep -v '(Running|Completed)' | wc -l` -eq 1 ]
 	do
-		echo "Waiting on istio-pilot"
-		sleep 5
-	done
-	until kubectl get pods -n istio-system | grep '^istio-ingressgateway.*Running'
-	do
-		echo "Waiting on istio-ingressgateway"
-		sleep 5
-	done
-	until kubectl get pods -n istio-system | grep '^istio-policy.*Running'
-	do
-		echo "Waiting on istio-policy"
-		sleep 5
-	done
-	until kubectl get pods -n istio-system | grep 'istio-telemetry.*Running'
-	do
-		echo "Waiting on istio-telemetry"
-		sleep 5
-	done
-	until kubectl get pods -n istio-system | grep 'istio-galley.*Running'
-	do
-		echo "Waiting on istio-galley"
-		sleep 5
-	done
-	until kubectl get pods -n istio-system | grep 'prometheus.*Running'
-	do
-		echo "Waiting on prometheus"
+		echo "Waiting for Istio"
 		sleep 5
 	done
 }
@@ -38,7 +13,7 @@ wait_on_istio ()
 wait_on_k8s ()
 {
 	# wait for kubernetes
-	until [ `kubectl get pods -n kube-system | grep -v Running | wc -l` -eq 1 ]
+	until [ `kubectl get pods -n kube-system | egrep -v '(Running|Completed)' | wc -l` -eq 1 ]
 	do
 		echo "Waiting for Kubernetes"
 		sleep 5
