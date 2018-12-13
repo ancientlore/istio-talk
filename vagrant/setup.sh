@@ -3,24 +3,34 @@
 wait_on_istio ()
 {
 	# wait for istio
-	until kubectl get pods -n istio-system | grep '^istio-ca.*Running'
-	do
-		echo "Waiting on istio-ca"
-		sleep 5
-	done
-	until kubectl get pods -n istio-system | grep '^istio-mixer.*Running'
-	do
-		echo "Waiting on istio-mixer"
-		sleep 5
-	done
 	until kubectl get pods -n istio-system | grep '^istio-pilot.*Running'
 	do
 		echo "Waiting on istio-pilot"
 		sleep 5
 	done
-	until kubectl get pods -n istio-system | grep 'istio-ingress.*Running'
+	until kubectl get pods -n istio-system | grep '^istio-ingressgateway.*Running'
 	do
-		echo "Waiting on istio-ingress"
+		echo "Waiting on istio-ingressgateway"
+		sleep 5
+	done
+	until kubectl get pods -n istio-system | grep '^istio-policy.*Running'
+	do
+		echo "Waiting on istio-policy"
+		sleep 5
+	done
+	until kubectl get pods -n istio-system | grep 'istio-telemetry.*Running'
+	do
+		echo "Waiting on istio-telemetry"
+		sleep 5
+	done
+	until kubectl get pods -n istio-system | grep 'istio-galley.*Running'
+	do
+		echo "Waiting on istio-galley"
+		sleep 5
+	done
+	until kubectl get pods -n istio-system | grep 'prometheus.*Running'
+	do
+		echo "Waiting on prometheus"
 		sleep 5
 	done
 }
@@ -28,7 +38,7 @@ wait_on_istio ()
 wait_on_k8s ()
 {
 	# wait for kubernetes
-	until [ `kubectl get pods -n kube-system | grep Running | wc -l` -eq 6 ]
+	until [ `kubectl get pods -n kube-system | grep -v Running | wc -l` -eq 1 ]
 	do
 		echo "Waiting for Kubernetes"
 		sleep 5
@@ -59,7 +69,7 @@ sudo snap install kubectl --classic
 
 # Install minikube
 echo "*** INSTALLING MINIKUBE ***"
-curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.25.0/minikube-linux-amd64
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.28.0/minikube-linux-amd64
 chmod +x minikube
 sudo mv minikube /usr/local/bin/
 
@@ -73,11 +83,9 @@ cd ..
 
 # Start minikube
 echo "*** STARTING MINIKUBE ***"
-sudo minikube start --vm-driver=none \
-	--extra-config=controller-manager.ClusterSigningCertFile="/var/lib/localkube/certs/ca.crt" \
-	--extra-config=controller-manager.ClusterSigningKeyFile="/var/lib/localkube/certs/ca.key" \
-	--extra-config=apiserver.Admission.PluginNames=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota \
-	--kubernetes-version=v1.9.0
+sudo minikube start --vm-driver=none --kubernetes-version=v1.10.3 \
+	--extra-config=controller-manager.cluster-signing-cert-file="/var/lib/localkube/certs/ca.crt" \
+	--extra-config=controller-manager.cluster-signing-key-file="/var/lib/localkube/certs/ca.key"
 sudo minikube addons enable ingress
 sleep 5 # allow k8s components to start up
 wait_on_k8s
@@ -89,9 +97,11 @@ kubectl config use-context minikube
 # Install Istio
 echo "*** INSTALLING ISTIO ***"
 cd istio*
-kubectl apply -f install/kubernetes/istio-auth.yaml
-echo "*** INSTALLING ISTIO ADDONS ***"
-kubectl apply -f install/kubernetes/addons/
+kubectl apply -f install/kubernetes/helm/istio/templates/crds.yaml
+sleep 10 # allow CRDs to be committed in kube-apiserver
+kubectl apply -f install/kubernetes/istio-demo-auth.yaml
+#echo "*** INSTALLING ISTIO ADDONS ***"
+#kubectl apply -f install/kubernetes/addons/
 cd ..
 wait_on_istio
 
@@ -107,9 +117,9 @@ echo "export KUBE_NAMESPACE=default" >> /home/vagrant/.profile
 
 # pull images
 echo "*** PULLING DOCKER IMAGES FOR LAB ***"
-sudo docker pull ancientlore/topdog:0.1.1
-sudo docker pull ancientlore/hurl:0.1
-sudo docker pull ancientlore/webnull:0.1
+sudo docker pull ancientlore/topdog:v0.1.2
+sudo docker pull ancientlore/hurl:v0.1.1
+sudo docker pull ancientlore/webnull:v0.1.1
 
 echo "*** INSTALLING DEMO CONTAINERS ***"
 kubectl apply -f <(istioctl kube-inject -f /vagrant/resiliency/hurl/kube/deployment.yaml)
@@ -125,9 +135,8 @@ kubectl apply -f /vagrant/vagrant/istio/demo-istio-ingress.yaml
 kubectl apply -f /vagrant/vagrant/istio/demo-nginx-ingress.yaml
 
 echo "*** ADDING ISTIO RULES ***"
-istioctl create -f /vagrant/trafficshifting/istio/route-rule-all-v1.yaml -n default
-istioctl create -f /vagrant/resiliency/istio/route-rule.yaml -n default
-istioctl create -f /vagrant/resiliency/istio/circuit-breaker.yaml -n default
+istioctl create -f /vagrant/trafficshifting/istio/services-all-v1.yaml -n default
+istioctl create -f /vagrant/resiliency/istio/services.yaml -n default
 
 # Adjust permissions due to having to run minikube as root
 echo "*** UPDATING MINIKUBE CONFIG/PERMISSIONS ***"
@@ -143,8 +152,8 @@ sudo chmod go+rx /root
 
 # install Go
 echo "*** INSTALLING GOLANG ***"
-curl https://dl.google.com/go/go1.10.2.linux-amd64.tar.gz > go1.10.2.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.10.2.linux-amd64.tar.gz
+curl https://dl.google.com/go/go1.11.2.linux-amd64.tar.gz > go1.11.2.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.11.2.linux-amd64.tar.gz
 export GOPATH=/home/vagrant
 echo "export GOPATH=/home/vagrant" >> /home/vagrant/.profile
 export PATH="$PATH:/usr/local/go/bin:/home/vagrant/bin"
@@ -153,11 +162,16 @@ go env
 echo "*** INSTALLING GO-based TOOLS ***"
 go get golang.org/x/tools/cmd/present
 go get golang.org/x/tools/cmd/stringer
-go get github.com/ancientlore/binder
-go get github.com/ancientlore/hurl
-go get github.com/ancientlore/webnull
-go get github.com/ancientlore/demon
-go get github.com/ancientlore/topdog
+git clone https://github.com/ancientlore/binder
+git clone https://github.com/ancientlore/hurl
+git clone https://github.com/ancientlore/webnull
+git clone https://github.com/ancientlore/demon
+git clone https://github.com/ancientlore/topdog
+cd binder && go install && cd -
+cd hurl && go install && cd -
+cd webnull && go install && cd -
+cd demon && go install && cd -
+cd topdog && go install && cd -
 
 echo 'echo "NOTE:"' >> /home/vagrant/.profile
 echo 'echo "Run /vagrant/vagrant-demo.sh to start the demo."' >> /home/vagrant/.profile
