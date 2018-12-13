@@ -1,17 +1,15 @@
-apiVersion: config.istio.io/v1alpha2
-kind: RouteRule
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
 metadata:
-  name: webnull-test-delay
+  name: webnull
 spec:
-  destination:
-    name: webnull
-  precedence: 3
-  match:
-    request:
-      headers:
-        method:
-          exact: GET
-  httpFault:
-    delay:
-      fixedDelay: 1.000s
-      percent: 5
+  hosts:
+  - webnull
+  http:
+  - route:
+    - destination:
+        host: webnull
+    fault:
+      delay:
+        percent: 5
+        fixedDelay: 1s

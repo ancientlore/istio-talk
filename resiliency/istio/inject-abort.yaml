@@ -1,17 +1,15 @@
-apiVersion: config.istio.io/v1alpha2
-kind: RouteRule
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
 metadata:
-  name: webnull-test-abort
+  name: webnull
 spec:
-  destination:
-    name: webnull
-  precedence: 5
-  match:
-    request:
-      headers:
-        method:
-          exact: GET
-  httpFault:
-    abort:
-      httpStatus: 400
-      percent: 1
+  hosts:
+  - webnull
+  http:
+  - route:
+    - destination:
+        host: webnull
+    fault:
+      abort:
+        percent: 1
+        httpStatus: 400

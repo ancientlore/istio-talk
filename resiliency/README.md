@@ -12,7 +12,7 @@ What is great about [Istio] is that these functions are part of the _infrastruct
 
 For this demo you need:
 
-* A Kubernetes cluster (or [Minikube]) with [Istio] installed.
+* A Kubernetes cluster (or [Minikube], or [Docker] for Desktop) with [Istio] installed.
 * The [kubectl command](https://kubernetes.io/docs/tasks/tools/install-kubectl/) should be installed.
 * Optionally, the [istioctl command](https://istio.io/docs/reference/commands/istioctl) can be used.
 
@@ -35,22 +35,19 @@ Make sure the containers are running:
     hurl-4211406881-d8rz5             2/2       Running   0          1m
     webnull-3334364612-nlwsr          2/2       Running   0          1m
 
-Set up the route rules for each service, and the circuit breaker destination policy:
+Set up the virtual services and destination rules for each service. Note that the destination rule for `webnull` has a circuit breaker.
 
     $ cd istio
-    $ istioctl create -f route-rule.yaml -n $KUBE_NAMESPACE
-    $ istioctl create -f circuit-breaker.yaml -n $KUBE_NAMESPACE
+    $ istioctl create -f services.yaml -n $KUBE_NAMESPACE
 
 > Note that you can generally use `kubectl` instead of `istioctl`, but `istioctl` provides additional client-side validation.
 
 You can check the route rules using `istioctl get routerules` or `kubectl get routerules`. You can also fetch an individual rule using:
 
-    $ istioctl get routerule webnull-default -n $KUBE_NAMESPACE -o yaml
-    $ istioctl get routerule hurl-default -n $KUBE_NAMESPACE -o yaml
-
-Similarly, you can get destination policies using `istioctl get destinationpolicies` or fetch an individual one:
-
-    $ istioctl get destinationpolicy webnull-circuit-breaker -n $KUBE_NAMESPACE -o yaml
+    $ istioctl get virtualservice webnull -n $KUBE_NAMESPACE -o yaml
+    $ istioctl get destinationrule webnull -n $KUBE_NAMESPACE -o yaml
+    $ istioctl get virtualservice hurl -n $KUBE_NAMESPACE -o yaml
+    $ istioctl get destinationrule hurl -n $KUBE_NAMESPACE -o yaml
 
 You're now ready to proceed with the demo.
 
@@ -58,7 +55,7 @@ You're now ready to proceed with the demo.
 
 Start [hurl] with a basic request set.
 
-    $ kubectl exec -it $(kubectl get pod -l app=hurl -o name | sed 's/^pods\///') /bin/sh
+    $ kubectl exec -it $(kubectl get pod -l app=hurl -o name | sed 's/^pod\///') /bin/sh
     # hurl -conns 10 -loop 2000000 http://webnull:8080/xml
 
 > Stay logged into the [hurl] container so that you can exercise commands later. In this walk-through, commands shown with `#` are executed in the hurl container, and commands shown with `$` are executed in your normal shell.
@@ -75,13 +72,14 @@ We will be using [hurl] to send load to [webnull], and then checking what happen
 
 > Note: Run the [Istio] commands from the `istio` folder.
 
-We have already set up a [default routerule](istio/route-rule.yaml) in [Istio]:
+We have already set up [virtual services and destination rules](istio/services.yaml) in [Istio]:
 
-    $ istioctl get routerule webnull-default -n $KUBE_NAMESPACE -o yaml
+    $ istioctl get virtualservice webnull -n $KUBE_NAMESPACE -o yaml
+    $ istioctl get destinationrule webnull -n $KUBE_NAMESPACE -o yaml
+    $ istioctl get virtualservice hurl -n $KUBE_NAMESPACE -o yaml
+    $ istioctl get destinationrule hurl -n $KUBE_NAMESPACE -o yaml
 
-Also, we have a [circuit breaker](istio/circuit-breaker.yaml) set up:
-
-    $ istioctl get destinationpolicy webnull-circuit-breaker -n $KUBE_NAMESPACE -o yaml
+Note that we have a circuit breaker set up for `webnull`.
 
 At this point, the service is "operating normally".
 
@@ -93,7 +91,7 @@ To trigger the circuit breaker, restart [hurl] with more connections:
 
     # hurl -conns 100 -loop 2000000 http://webnull:8080/xml 
 
-Note the large number of HTTP 503 responses from the circuit breaker.
+Note the large number of HTTP 503 responses from the circuit breaker. Technically, this is triggering connection limits. Part of the circuit breaker's configuration responds to errors coming from the service.
 
 > See region B on the diagram below
 
@@ -109,7 +107,7 @@ Things return to normal, although [Istio] may still have the circuit breaker tri
 
 Next, we will inject [faults](istio/inject-abort.yaml) into the system.
 
-    $ istioctl create -f inject-abort.yaml -n $KUBE_NAMESPACE
+    $ istioctl replace -f inject-abort.yaml -n $KUBE_NAMESPACE
 
 Note the HTTP 400 responses from the fault. This can be used to test how upstream services respond to failures.
 
@@ -117,7 +115,7 @@ Note the HTTP 400 responses from the fault. This can be used to test how upstrea
 
 Now remove the fault:
 
-    $ istioctl delete routerule webnull-test-abort -n $KUBE_NAMESPACE
+    $ istioctl replace -f istio/services.yaml -n $KUBE_NAMESPACE
 
 Note how the service returns to normal.
 
@@ -127,7 +125,7 @@ Note how the service returns to normal.
 
 We will now inject a [small delay](istio/inject-delay.yaml) into some percentage of the requests.
 
-    $ istioctl create -f inject-delay.yaml -n $KUBE_NAMESPACE
+    $ istioctl replace -f inject-delay.yaml -n $KUBE_NAMESPACE
 
 Note that even with this small delay, the service doesn't process as many transactions.
 
@@ -135,7 +133,7 @@ Note that even with this small delay, the service doesn't process as many transa
 
 Remove the small delay:
 
-    $ istioctl delete routerule webnull-test-delay -n $KUBE_NAMESPACE
+    $ istioctl replace -f istio/services.yaml -n $KUBE_NAMESPACE
 
 Note the service return to normal.
 
@@ -145,7 +143,7 @@ Note the service return to normal.
 
 Now let's inject a [larger delay](istio/inject-big-delay.yaml) on more requests, simulating a potential database performance issue.
 
-    $ istioctl create -f inject-big-delay.yaml -n $KUBE_NAMESPACE
+    $ istioctl replace -f inject-big-delay.yaml -n $KUBE_NAMESPACE
 
 Note how the service practically falls over.
 
@@ -161,7 +159,7 @@ Note that the service improves, but is still hurting. In some cases it might als
 
 "Fix the database" and remove the delay.
 
-    $ istioctl delete routerule webnull-test-bigdelay -n $KUBE_NAMESPACE
+    $ istioctl replace -f istio/services.yaml -n $KUBE_NAMESPACE
 
 Now the circuit breaker is triggering - why? The reason is that we still have many requests going.
 
@@ -183,7 +181,7 @@ To test request timeouts, first try a long-running page without a timeout in pla
 
 Next, set up the [request timeout](istio/request-timeout.yaml) route rule.
 
-    $ istioctl create -f request-timeout.yaml -n $KUBE_NAMESPACE
+    $ istioctl replace -f request-timeout.yaml -n $KUBE_NAMESPACE
 
 Wait a moment for the Istio proxy to update, then try the request again:
 
@@ -192,7 +190,7 @@ Wait a moment for the Istio proxy to update, then try the request again:
 
 Clean up the rule:
 
-    $ istioctl delete routerule webnull-request-timeout -n $KUBE_NAMESPACE
+    $ istioctl replace -f istio/services.yaml -n $KUBE_NAMESPACE
 
 ## Diagram
 
@@ -211,3 +209,4 @@ Clean up the rule:
 [hurl]: https://github.com/ancientlore/hurl
 [Istio]: https://istio.io/
 [curl]: https://curl.haxx.se/
+[Docker]: https://www.docker.com/

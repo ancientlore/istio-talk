@@ -37,16 +37,16 @@
             "input": "kubectl get pods | egrep '(^NAME|webnull|hurl)'"
         },
         {
-            "title": "Check the route rules",
-            "desc": "These rules were created earlier.",
+            "title": "Check the virtual services",
+            "desc": "These virtual services were created earlier.",
             "id": "bash",
-            "input": "istioctl get routerules | egrep '(^NAME|webnull|hurl)'"
+            "input": "istioctl get virtualservices | egrep '(^NAME|webnull|hurl)'"
         },
         {
-            "title": "Check the destination policies",
-            "desc": "These policies were created earlier.",
+            "title": "Check the destination rules",
+            "desc": "These rules were created earlier.",
             "id": "bash",
-            "input": "istioctl get destinationpolicies | egrep '(^NAME|webnull|hurl)'"
+            "input": "istioctl get destinationrules | egrep '(^NAME|webnull|hurl)'"
         },
         {
             "title": "Create some initial load",
@@ -61,10 +61,10 @@
             "input": "kill -15 $pid ; hurl -conns 100 -loop 2000000 http://webnull:8080/xml 2> /dev/null & pid=$!"
         },
         {
-            "title": "Look at the circuit breaker policy",
-            "desc": "Let's take a look at the circuit breaker destination policy.",
+            "title": "Look at the circuit breaker rule",
+            "desc": "Let's take a look at the circuit breaker destination rule.",
             "id": "bash",
-            "input": "istioctl get destinationpolicy webnull-circuit-breaker -n $KUBE_NAMESPACE -o yaml"
+            "input": "istioctl get destinationrule webnull -n $KUBE_NAMESPACE -o yaml"
         },
         {
             "title": "Return to normal load",
@@ -76,43 +76,43 @@
             "title": "Test fault injection",
             "desc": "Inject a 400 error in 1% of the requests.",
             "id": "bash",
-            "input": "istioctl create -f inject-abort.yaml -n $KUBE_NAMESPACE"
+            "input": "istioctl replace -f inject-abort.yaml -n $KUBE_NAMESPACE"
         },
         {
             "title": "Look at the fault injection rule",
-            "desc": "Let's take a look at the fault injection route rule.",
+            "desc": "Let's take a look at the fault injection rule.",
             "id": "bash",
-            "input": "istioctl get routerule webnull-test-abort -n $KUBE_NAMESPACE -o yaml"
+            "input": "istioctl get virtualservice webnull -n $KUBE_NAMESPACE -o yaml"
         },
         {
             "title": "Remove the fault",
             "desc": "Remove the rule that injects faults.",
             "id": "bash",
-            "input": "istioctl delete routerule webnull-test-abort -n $KUBE_NAMESPACE"
+            "input": "istioctl replace -f services.yaml -n $KUBE_NAMESPACE"
         },
         {
             "title": "Test delay injection",
             "desc": "Now create a rule that injects a 1s delay in 5% of the requests.",
             "id": "bash",
-            "input": "istioctl create -f inject-delay.yaml -n $KUBE_NAMESPACE"
+            "input": "istioctl replace -f inject-delay.yaml -n $KUBE_NAMESPACE"
         },
         {
             "title": "Look at the delay injection rule",
-            "desc": "Let's take a look at the delay injection route rule.",
+            "desc": "Let's take a look at the delay injection rule.",
             "id": "bash",
-            "input": "istioctl get routerule webnull-test-delay -n $KUBE_NAMESPACE -o yaml"
+            "input": "istioctl get virtualservice webnull -n $KUBE_NAMESPACE -o yaml"
         },
         {
             "title": "Remove the delay",
             "desc": "Remove the rule that injects the delay.",
             "id": "bash",
-            "input": "istioctl delete routerule webnull-test-delay -n $KUBE_NAMESPACE"
+            "input": "istioctl replace -f services.yaml -n $KUBE_NAMESPACE"
         },
         {
             "title": "Inject a large delay",
             "desc": "Create a rule that injects in 4s delay in 25% of the requests.",
             "id": "bash",
-            "input": "istioctl create -f inject-big-delay.yaml -n $KUBE_NAMESPACE"
+            "input": "istioctl replace -f inject-big-delay.yaml -n $KUBE_NAMESPACE"
         },
         {
             "title": "Increase load",
@@ -124,7 +124,7 @@
             "title": "Fix the delay",
             "desc": "Let's \"fix\" the delay by removing the route rule.",
             "id": "bash",
-            "input": "istioctl delete routerule webnull-test-bigdelay -n $KUBE_NAMESPACE"
+            "input": "istioctl replace -f services.yaml -n $KUBE_NAMESPACE"
         },
         {
             "title": "Connections should return to normal",
@@ -142,13 +142,13 @@
             "title": "Set up request timeout rule",
             "desc": "Configure a request timeout rule.",
             "id": "bash",
-            "input": "istioctl create -f request-timeout.yaml -n $KUBE_NAMESPACE"
+            "input": "istioctl replace -f request-timeout.yaml -n $KUBE_NAMESPACE"
         },
         {
             "title": "Look at the request timeout rule",
             "desc": "Let's take a look at the request timeout route rule.",
             "id": "bash",
-            "input": "istioctl get routerule webnull-request-timeout -n $KUBE_NAMESPACE -o yaml"
+            "input": "istioctl get virtualservice webnull -n $KUBE_NAMESPACE -o yaml"
         },
         {
             "title": "Try the long request again",
@@ -160,7 +160,7 @@
             "title": "Clean up the timeout rule",
             "desc": "Clean up after ourselves.",
             "id": "bash",
-            "input": "istioctl delete routerule webnull-request-timeout -n $KUBE_NAMESPACE"
+            "input": "istioctl replace -f services.yaml -n $KUBE_NAMESPACE"
         }
     ]
 }
