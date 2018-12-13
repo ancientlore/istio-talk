@@ -14,7 +14,7 @@ The demo is based on a simple application called [topdog]. [topdog] has three ti
 
 For this demo you need:
 
-* A Kubernetes cluster (or [Minikube]) with [Istio] installed.
+* A Kubernetes cluster (or [Minikube], or [Docker] for Desktop) with [Istio] installed.
 * The [kubectl command](https://kubernetes.io/docs/tasks/tools/install-kubectl/) should be installed.
 * Optionally, the [istioctl command](https://istio.io/docs/reference/commands/istioctl) can be used.
 
@@ -40,18 +40,24 @@ Make sure the containers are running:
 
 > Note that there are three versions of the backend pod, one version of the midtier pod, and one version of the UI pod. Normally we wouldn't create three versions of the backend at the same time.
 
-Set up the route rules for each service:
+Set up the virtual services and destination rules for each service:
 
     $ cd istio
-    $ istioctl create -f route-rule-all-v1.yaml -n $KUBE_NAMESPACE
+    $ istioctl create -f services-all-v1.yaml -n $KUBE_NAMESPACE
 
 > Note that you can generally use `kubectl` instead of `istioctl`, but `istioctl` provides additional client-side validation.
 
-You can check the route rules using `istioctl get routerules` or `kubectl get routerules`. You can also fetch an individual rule using:
+You can check the virtual services using `istioctl get virtualservices` or `kubectl get virtualservices`. You can also fetch an individual service using:
 
-    $ istioctl get routerule topdogui-default -n $KUBE_NAMESPACE -o yaml
-    $ istioctl get routerule topdogmt-default -n $KUBE_NAMESPACE -o yaml
-    $ istioctl get routerule topdogbe-default -n $KUBE_NAMESPACE -o yaml
+    $ istioctl get virtualservice topdogui -n $KUBE_NAMESPACE -o yaml
+    $ istioctl get virtualservice topdogmt -n $KUBE_NAMESPACE -o yaml
+    $ istioctl get virtualservice topdogbe -n $KUBE_NAMESPACE -o yaml
+
+You can check the destination rules using `istioctl get destinationrules` or `kubectl get destinationrules`. You can also fetch an individual destination rule using:
+
+    $ istioctl get destinationrule topdogui -n $KUBE_NAMESPACE -o yaml
+    $ istioctl get destinationrule topdogmt -n $KUBE_NAMESPACE -o yaml
+    $ istioctl get destinatiorule topdogbe -n $KUBE_NAMESPACE -o yaml
 
 You're now ready to proceed with the demo.
 
@@ -67,9 +73,9 @@ View the user interface by running the following command (in a new shell) and th
 
 > Note: Run the [Istio] commands from the [istio](istio) subfolder.
 
-We start out with a [default set of routerules](istio/route-rule-all-v1.yaml) that we created earlier:
+We start out with a [default set of virtual services and destination rules](istio/services-all-v1.yaml) that we created earlier:
 
-    $ istioctl create -f route-rule-all-v1.yaml -n $KUBE_NAMESPACE
+    $ istioctl create -f services-all-v1.yaml -n $KUBE_NAMESPACE
 
 These rules pass all traffic to the `v1` version of the services.
 
@@ -81,31 +87,29 @@ The first version works, but the results seem skewed to benefit the original dev
 
 Someone on the team decided to fix this. Let's test their version, routing traffic 50/50 between `v1` and `v2`.
 
-    $ istioctl create -f route-rule-be-v1-v2.yaml -n $KUBE_NAMESPACE
+    $ istioctl replace -f service-be-v1-v2.yaml -n $KUBE_NAMESPACE
 
-Because [this route rule](istio/route-rule-be-v1-v2.yaml) is at a higher priority, it will apply to requests to the backend service.
+This [virtual service](istio/service-be-v1-v2.yaml) defines weighted routes so that traffic arriving uses both `v1` and `v2`.
 
 ## Second Version
 
 The second version fixed the original bug, but it introduced occasional failures. We noticed that retrying the request works. So, we decided to add in retries using [Istio] rather than back out the new service. We can't let the original developer be the top dog.
 
-    $ istioctl create -f route-rule-mt-retry.yaml -n $KUBE_NAMESPACE
+    $ istioctl replace -f service-mt-retry.yaml -n $KUBE_NAMESPACE
 
-The [retry rule](istio/route-rule-mt-retry.yaml) fixes the problems, so we're going to move all the traffic to `v2` by [replacing the route rule](istio/route-rule-be-v2.yaml) and deleting the 50/50 rule.
+The [retry logic](istio/service-mt-retry.yaml) fixes the problems, so we're going to move all the traffic to `v2` by [replacing the virtual service](istio/service-be-v2.yaml) and deleting the 50/50 rule.
     
-    $ istioctl replace -f route-rule-be-v2.yaml -n $KUBE_NAMESPACE
-    $ istioctl delete routerule topdogbe-shift -n $KUBE_NAMESPACE
+    $ istioctl replace -f service-be-v2.yaml -n $KUBE_NAMESPACE
 
 ## Third Version
 
-Now another team member decided that we really should fix the problem, even though we have worked around the issue. So let's start moving traffic 50/50 between `v2` and `v3` using a [new rule](istio/route-rule-be-v2-v3.yaml).
+Now another team member decided that we really should fix the problem, even though we have worked around the issue. So let's start moving traffic 50/50 between `v2` and `v3` using a [new route](istio/service-be-v2-v3.yaml).
 
-    $ istioctl create -f route-rule-be-v2-v3.yaml -n $KUBE_NAMESPACE
+    $ istioctl replace -f service-be-v2-v3.yaml -n $KUBE_NAMESPACE
 
-That seems to look good, so we'll route all the traffic to `v3` by [replacing the route rule](istio/route-rule-be-v3.yaml) and deleting the 50/50 rule.
+That seems to look good, so we'll route all the traffic to `v3` by [replacing the virtual service](istio/service-be-v3.yaml), thus deleting the 50/50 rule.
 
-    $ istioctl replace -f route-rule-be-v3.yaml -n $KUBE_NAMESPACE
-    $ istioctl delete routerule topdogbe-shift -n $KUBE_NAMESPACE
+    $ istioctl replace -f service-be-v3.yaml -n $KUBE_NAMESPACE
 
 Do the results still seem skewed?
 

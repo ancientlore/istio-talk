@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: topdogmt
+spec:
+  hosts:
+  - topdogmt
+  http:
+  - route:
+    - destination:
+        host: topdogmt
+        subset: v1
+    retries:
+      attempts: 3
+      perTryTimeout: 100ms

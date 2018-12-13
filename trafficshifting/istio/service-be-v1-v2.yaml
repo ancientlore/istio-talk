@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: topdogbe
+spec:
+  hosts:
+  - topdogbe
+  http:
+  - route:
+    - destination:
+        host: topdogbe
+        subset: v1
+      weight: 50
+    - destination:
+        host: topdogbe
+        subset: v2
+      weight: 50

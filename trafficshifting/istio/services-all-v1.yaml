@@ -1,0 +1,86 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: topdogui
+spec:
+  hosts:
+  - topdogui
+  http:
+  - route:
+    - destination:
+        host: topdogui
+        subset: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: topdogui
+spec:
+  host: topdogui
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: topdogmt
+spec:
+  hosts:
+  - topdogmt
+  http:
+  - route:
+    - destination:
+        host: topdogmt
+        subset: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: topdogmt
+spec:
+  host: topdogmt
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: topdogbe
+spec:
+  hosts:
+  - topdogbe
+  http:
+  - route:
+    - destination:
+        host: topdogbe
+        subset: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: topdogbe
+spec:
+  host: topdogbe
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2
+  - name: v3
+    labels:
+      version: v3
