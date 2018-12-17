@@ -5,6 +5,9 @@ metadata:
 spec:
   hosts:
   - webnull
+  - webnull.127.0.0.1.xip.io
+  gateways:
+  - webnull-gateway
   http:
   - route:
     - destination:
@@ -39,6 +42,9 @@ metadata:
 spec:
   hosts:
   - hurl
+  - hurl.127.0.0.1.xip.io
+  gateways:
+  - hurl-gateway
   http:
   - route:
     - destination:

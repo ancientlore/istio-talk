@@ -5,6 +5,9 @@ metadata:
 spec:
   hosts:
   - topdogui
+  - topdog.127.0.0.1.xip.io
+  gateways:
+  - topdog-gateway
   http:
   - route:
     - destination:
