@@ -81,8 +81,11 @@ cd ..
 wait_on_istio
 
 # ingress
-echo "*** INSTALLING ISTIO ADDONS INGRESS***"
-kubectl apply -f /vagrant/vagrant/istio/ingress.yaml
+echo "*** INSTALLING ISTIO ADDONS GATEWAYS ***"
+kubectl apply -f /vagrant/vagrant/istio/grafana-gateway.yaml
+kubectl apply -f /vagrant/vagrant/istio/jaeger-gateway.yaml
+kubectl apply -f /vagrant/vagrant/istio/servicegraph-gateway.yaml
+kubectl apply -f /vagrant/vagrant/istio/zipkin-gateway.yaml
 sleep 5
 
 # k8s
@@ -105,11 +108,10 @@ kubectl apply -f <(istioctl kube-inject -f /vagrant/trafficshifting/topdog/kube/
 kubectl apply -f <(istioctl kube-inject -f /vagrant/trafficshifting/topdog/kube/deployment-mt-v1.yaml)
 kubectl apply -f <(istioctl kube-inject -f /vagrant/trafficshifting/topdog/kube/deployment-ui-v1.yaml)
 
-echo "*** INSTALLING DEMO INGRESS ***"
-kubectl apply -f /vagrant/vagrant/istio/demo-istio-ingress.yaml
-kubectl apply -f /vagrant/vagrant/istio/demo-nginx-ingress.yaml
+echo "*** INSTALLING DEMO GATEWAYS ***"
+kubectl apply -f /vagrant/vagrant/istio/demo-gateway.yaml
 
-echo "*** ADDING ISTIO RULES ***"
+echo "*** ADDING ISTIO VIRTUAL SERVICES ***"
 istioctl create -f /vagrant/trafficshifting/istio/services-all-v1.yaml -n default
 istioctl create -f /vagrant/resiliency/istio/services.yaml -n default
 
@@ -127,8 +129,8 @@ sudo chmod go+rx /root
 
 # install Go
 echo "*** INSTALLING GOLANG ***"
-curl https://dl.google.com/go/go1.11.2.linux-amd64.tar.gz > go1.11.2.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.11.2.linux-amd64.tar.gz
+curl https://dl.google.com/go/go1.11.4.linux-amd64.tar.gz > go1.11.4.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.11.4.linux-amd64.tar.gz
 export GOPATH=/home/vagrant
 echo "export GOPATH=/home/vagrant" >> /home/vagrant/.profile
 export PATH="$PATH:/usr/local/go/bin:/home/vagrant/bin"

@@ -6,6 +6,7 @@ spec:
   hosts:
   - topdogui
   - topdog.127.0.0.1.xip.io
+  - topdog.192.168.99.101.xip.io
   gateways:
   - topdog-gateway
   http:

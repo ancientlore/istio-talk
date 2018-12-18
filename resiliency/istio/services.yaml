@@ -6,6 +6,7 @@ spec:
   hosts:
   - webnull
   - webnull.127.0.0.1.xip.io
+  - webnull.192.168.99.101.xip.io
   gateways:
   - webnull-gateway
   http:
@@ -43,6 +44,7 @@ spec:
   hosts:
   - hurl
   - hurl.127.0.0.1.xip.io
+  - hurl.192.168.99.101.xip.io
   gateways:
   - hurl-gateway
   http:

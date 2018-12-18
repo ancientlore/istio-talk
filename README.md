@@ -30,6 +30,7 @@ This will start the `present` tool on http://192.168.99.101:8080/ and the first 
 
 The Vagrant version also has the Istio tools available at:
 
+* http://jaeger.192.168.99.101.xip.io/zipkin
 * http://zipkin.192.168.99.101.xip.io/zipkin
 * http://grafana.192.168.99.101.xip.io/
 * http://servicegraph.192.168.99.101.xip.io/dotviz
@@ -39,6 +40,36 @@ And the demo pods can be reached directly at:
 * http://topdog.192.168.99.101.xip.io/
 * http://hurl.192.168.99.101.xip.io/
 * http://webnull.192.168.99.101.xip.io/status
+
+## Docker for Desktop Version
+
+If you have Docker for Desktop, you can enable Kubernetes and then [install Istio](https://istio.io/docs/setup/kubernetes/quick-start/). You will also need to [install Go](https://golang.org/doc/install), making sure it's on your path.
+
+Install the Go tools as well:
+
+    go get golang.org/x/tools/cmd/present
+    git clone https://github.com/ancientlore/demon
+    cd demon && go install && cd -
+    rm -rf demon
+
+The following script will set up the demos:
+
+    ./docker/setup.sh
+
+Then run `demo.sh` to start the demo.
+
+The Docker version also has the Istio tools available at:
+
+* http://jaeger.127.0.0.1.xip.io/zipkin
+* http://zipkin.127.0.0.1.xip.io/zipkin
+* http://grafana.127.0.0.1.xip.io/
+* http://servicegraph.127.0.0.1.xip.io/dotviz
+
+And the demo pods can be reached directly at:
+
+* http://topdog.127.0.0.1.xip.io/
+* http://hurl.127.0.0.1.xip.io/
+* http://webnull.127.0.0.1.xip.io/status
 
 ## Notes
 
