@@ -1,7 +1,7 @@
 Vagrant.configure("2") do |config|
 
   # Build 
-  config.vm.box = "ubuntu/xenial64"
+  config.vm.box = "ubuntu/bionic64"
   config.vm.box_check_update = true
 
   config.vm.network "private_network", ip: "192.168.99.101"
