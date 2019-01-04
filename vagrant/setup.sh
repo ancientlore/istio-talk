@@ -90,6 +90,7 @@ kubectl apply -f /vagrant/vagrant/istio/grafana-gateway.yaml
 kubectl apply -f /vagrant/vagrant/istio/jaeger-gateway.yaml
 kubectl apply -f /vagrant/vagrant/istio/servicegraph-gateway.yaml
 kubectl apply -f /vagrant/vagrant/istio/zipkin-gateway.yaml
+kubectl apply -f /vagrant/vagrant/istio/ingress.yaml
 sleep 5
 
 # k8s

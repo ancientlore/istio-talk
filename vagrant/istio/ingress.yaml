@@ -1,0 +1,9 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: minikube-ingress
+  namespace: istio-system
+spec:
+  backend:
+    serviceName: istio-ingressgateway
+    servicePort: 80
