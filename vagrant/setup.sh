@@ -100,9 +100,9 @@ echo "export KUBE_NAMESPACE=default" >> /home/vagrant/.profile
 
 # pull images
 echo "*** PULLING DOCKER IMAGES FOR LAB ***"
-sudo docker pull ancientlore/topdog:v0.1.2
-sudo docker pull ancientlore/hurl:v0.1.1
-sudo docker pull ancientlore/webnull:v0.1.1
+sudo docker pull ancientlore/topdog:v0.1.4
+sudo docker pull ancientlore/hurl:v0.1.2
+sudo docker pull ancientlore/webnull:v0.1.3
 
 echo "*** INSTALLING DEMO CONTAINERS ***"
 kubectl apply -f <(istioctl kube-inject -f /vagrant/resiliency/hurl/kube/deployment.yaml)

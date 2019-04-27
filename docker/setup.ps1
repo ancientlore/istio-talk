@@ -1,7 +1,7 @@
 
 Write-Output "*** TEST KUBECTL ***"
 kubectl config view
-kubectl config use-context docker-for-desktop
+kubectl config use-context docker-desktop
 
 # Wait for Istio
 #echo "*** WAITING ON ISTIO ***"
@@ -21,9 +21,9 @@ Set-Variable -name KUBE_NAMESPACE -value default
 
 # pull images
 Write-Output "*** PULLING DOCKER IMAGES FOR LAB ***"
-docker pull ancientlore/topdog:v0.1.2
-docker pull ancientlore/hurl:v0.1.1
-docker pull ancientlore/webnull:v0.1.1
+docker pull ancientlore/topdog:v0.1.4
+docker pull ancientlore/hurl:v0.1.2
+docker pull ancientlore/webnull:v0.1.3
 
 Write-Output "*** INSTALLING DEMO CONTAINERS ***"
 istioctl kube-inject -f .\resiliency\hurl\kube\deployment.yaml > _hurl.yaml
