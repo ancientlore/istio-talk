@@ -49,7 +49,7 @@ echo "*** INSTALLING DEMO GATEWAYS ***"
 kubectl apply -f ./docker/istio/demo-gateway.yaml
 
 echo "*** ADDING ISTIO VIRTUAL SERVICES ***"
-istioctl create -f ./trafficshifting/istio/services-all-v1.yaml -n default
-istioctl create -f ./resiliency/istio/services.yaml -n default
+kubectl apply -f ./trafficshifting/istio/services-all-v1.yaml -n default
+kubectl apply -f ./resiliency/istio/services.yaml -n default
 
 echo 'echo "Run ./demo.sh to start the demo."'

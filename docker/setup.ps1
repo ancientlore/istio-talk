@@ -46,7 +46,7 @@ Write-Output "*** INSTALLING DEMO GATEWAYS ***"
 kubectl apply -f .\docker\istio\demo-gateway.yaml
 
 Write-Output "*** ADDING ISTIO VIRTUAL SERVICES ***"
-istioctl create -f .\trafficshifting\istio\services-all-v1.yaml -n default
-istioctl create -f .\resiliency\istio\services.yaml -n default
+kubectl apply -f .\trafficshifting\istio\services-all-v1.yaml -n default
+kubectl apply create -f .\resiliency\istio\services.yaml -n default
 
 Write-Output 'echo "Run .\demo.sh to start the demo. You need the bash shell."'

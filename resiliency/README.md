@@ -38,16 +38,16 @@ Make sure the containers are running:
 Set up the virtual services and destination rules for each service. Note that the destination rule for `webnull` has a circuit breaker.
 
     $ cd istio
-    $ istioctl create -f services.yaml -n $KUBE_NAMESPACE
+    $ kubectl apply -f services.yaml -n $KUBE_NAMESPACE
 
 > Note that you can generally use `kubectl` instead of `istioctl`, but `istioctl` provides additional client-side validation.
 
 You can check the route rules using `istioctl get routerules` or `kubectl get routerules`. You can also fetch an individual rule using:
 
-    $ istioctl get virtualservice webnull -n $KUBE_NAMESPACE -o yaml
-    $ istioctl get destinationrule webnull -n $KUBE_NAMESPACE -o yaml
-    $ istioctl get virtualservice hurl -n $KUBE_NAMESPACE -o yaml
-    $ istioctl get destinationrule hurl -n $KUBE_NAMESPACE -o yaml
+    $ kubectl get virtualservice webnull -n $KUBE_NAMESPACE -o yaml
+    $ kubectl get destinationrule webnull -n $KUBE_NAMESPACE -o yaml
+    $ kubectl get virtualservice hurl -n $KUBE_NAMESPACE -o yaml
+    $ kubectl get destinationrule hurl -n $KUBE_NAMESPACE -o yaml
 
 You're now ready to proceed with the demo.
 
@@ -74,10 +74,10 @@ We will be using [hurl] to send load to [webnull], and then checking what happen
 
 We have already set up [virtual services and destination rules](istio/services.yaml) in [Istio]:
 
-    $ istioctl get virtualservice webnull -n $KUBE_NAMESPACE -o yaml
-    $ istioctl get destinationrule webnull -n $KUBE_NAMESPACE -o yaml
-    $ istioctl get virtualservice hurl -n $KUBE_NAMESPACE -o yaml
-    $ istioctl get destinationrule hurl -n $KUBE_NAMESPACE -o yaml
+    $ kubectl get virtualservice webnull -n $KUBE_NAMESPACE -o yaml
+    $ kubectl get destinationrule webnull -n $KUBE_NAMESPACE -o yaml
+    $ kubectl get virtualservice hurl -n $KUBE_NAMESPACE -o yaml
+    $ kubectl get destinationrule hurl -n $KUBE_NAMESPACE -o yaml
 
 Note that we have a circuit breaker set up for `webnull`.
 
@@ -107,7 +107,7 @@ Things return to normal, although [Istio] may still have the circuit breaker tri
 
 Next, we will inject [faults](istio/inject-abort.yaml) into the system.
 
-    $ istioctl replace -f inject-abort.yaml -n $KUBE_NAMESPACE
+    $ kubectl apply -f inject-abort.yaml -n $KUBE_NAMESPACE
 
 Note the HTTP 400 responses from the fault. This can be used to test how upstream services respond to failures.
 
@@ -115,7 +115,7 @@ Note the HTTP 400 responses from the fault. This can be used to test how upstrea
 
 Now remove the fault:
 
-    $ istioctl replace -f istio/services.yaml -n $KUBE_NAMESPACE
+    $ kubectl apply -f istio/services.yaml -n $KUBE_NAMESPACE
 
 Note how the service returns to normal.
 
@@ -125,7 +125,7 @@ Note how the service returns to normal.
 
 We will now inject a [small delay](istio/inject-delay.yaml) into some percentage of the requests.
 
-    $ istioctl replace -f inject-delay.yaml -n $KUBE_NAMESPACE
+    $ kubectl apply -f inject-delay.yaml -n $KUBE_NAMESPACE
 
 Note that even with this small delay, the service doesn't process as many transactions.
 
@@ -133,7 +133,7 @@ Note that even with this small delay, the service doesn't process as many transa
 
 Remove the small delay:
 
-    $ istioctl replace -f istio/services.yaml -n $KUBE_NAMESPACE
+    $ kubectl apply -f istio/services.yaml -n $KUBE_NAMESPACE
 
 Note the service return to normal.
 
@@ -143,7 +143,7 @@ Note the service return to normal.
 
 Now let's inject a [larger delay](istio/inject-big-delay.yaml) on more requests, simulating a potential database performance issue.
 
-    $ istioctl replace -f inject-big-delay.yaml -n $KUBE_NAMESPACE
+    $ kubectl apply -f inject-big-delay.yaml -n $KUBE_NAMESPACE
 
 Note how the service practically falls over.
 
@@ -159,7 +159,7 @@ Note that the service improves, but is still hurting. In some cases it might als
 
 "Fix the database" and remove the delay.
 
-    $ istioctl replace -f istio/services.yaml -n $KUBE_NAMESPACE
+    $ kubectl apply -f istio/services.yaml -n $KUBE_NAMESPACE
 
 Now the circuit breaker is triggering - why? The reason is that we still have many requests going.
 
@@ -181,7 +181,7 @@ To test request timeouts, first try a long-running page without a timeout in pla
 
 Next, set up the [request timeout](istio/request-timeout.yaml) route rule.
 
-    $ istioctl replace -f request-timeout.yaml -n $KUBE_NAMESPACE
+    $ kubectl apply -f request-timeout.yaml -n $KUBE_NAMESPACE
 
 Wait a moment for the Istio proxy to update, then try the request again:
 
@@ -190,7 +190,7 @@ Wait a moment for the Istio proxy to update, then try the request again:
 
 Clean up the rule:
 
-    $ istioctl replace -f istio/services.yaml -n $KUBE_NAMESPACE
+    $ kubectl apply -f istio/services.yaml -n $KUBE_NAMESPACE
 
 ## Diagram
 

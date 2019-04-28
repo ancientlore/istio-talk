@@ -28,25 +28,25 @@
             "title": "Check the virtual services",
             "desc": "These virtual services were created earlier. They direct all traffic to v1 of the topdog services.",
             "id": "bash",
-            "input": "istioctl get virtualservices | egrep '(^NAME|topdog)'"
+            "input": "kubectl get virtualservices | egrep '(^NAME|topdog)'"
         },
         {
             "title": "Check the destination rules",
             "desc": "These destination rules were created earlier. They direct all traffic to v1 of the topdog services.",
             "id": "bash",
-            "input": "istioctl get destinationrules | egrep '(^NAME|topdog)'"
+            "input": "kubectl get destinationrules | egrep '(^NAME|topdog)'"
         },
         {
             "title": "Inspect a virtual service",
             "desc": "The virtual service specifies the subset of the versions to use.",
             "id": "bash",
-            "input": "istioctl get virtualservice topdogbe -n $KUBE_NAMESPACE -o yaml"
+            "input": "kubectl get virtualservice topdogbe -n $KUBE_NAMESPACE -o yaml"
         },
         {
             "title": "Inspect a destination rule",
             "desc": "The destination rule defines the subsets using Kubernetes labels.",
             "id": "bash",
-            "input": "istioctl get destinationrule topdogbe -n $KUBE_NAMESPACE -o yaml"
+            "input": "kubectl get destinationrule topdogbe -n $KUBE_NAMESPACE -o yaml"
         },
         {
             "title": "Observe the problem with v1",
@@ -58,13 +58,13 @@
             "title": "Fix the service with v2",
             "desc": "A team member fixed the unabashed bias. Let's roll it out 50/50 between v1 and v2.",
             "id": "bash",
-            "input": "istioctl replace -f service-be-v1-v2.yaml -n $KUBE_NAMESPACE"
+            "input": "kubectl apply -f service-be-v1-v2.yaml -n $KUBE_NAMESPACE"
         },
         {
             "title": "Look at the traffic shifting rule",
             "desc": "While we wait for it to apply, let's inspect what the traffic shifting rule looks like.",
             "id": "bash",
-            "input": "istioctl get virtualservice topdogbe -n $KUBE_NAMESPACE -o yaml"
+            "input": "kubectl get virtualservice topdogbe -n $KUBE_NAMESPACE -o yaml"
         },
         {
             "title": "Observe the 50/50 utilization, and a new bug",
@@ -76,31 +76,31 @@
             "title": "Fix v2 with an HTTP retry rule",
             "desc": "Retries to the midtier will fix the v2 problem. That's better than reverting in this case.",
             "id": "bash",
-            "input": "istioctl replace -f service-mt-retry.yaml -n $KUBE_NAMESPACE"
+            "input": "kubectl apply -f service-mt-retry.yaml -n $KUBE_NAMESPACE"
         },
         {
             "title": "Look at the retry rule",
             "desc": "While we wait for it to apply, let's inspect what the retry rule looks like.",
             "id": "bash",
-            "input": "istioctl get virtualservice topdogmt -n $KUBE_NAMESPACE -o yaml"
+            "input": "kubectl get virtualservice topdogmt -n $KUBE_NAMESPACE -o yaml"
         },
         {
             "title": "Move all traffic to v2",
             "desc": "Everything looks good, so we'll reset the default route to v2.",
             "id": "bash",
-            "input": "istioctl replace -f service-be-v2.yaml -n $KUBE_NAMESPACE"
+            "input": "kubectl apply -f service-be-v2.yaml -n $KUBE_NAMESPACE"
         },
         {
             "title": "Shift traffic to a v3 which fixes the 500 bug",
             "desc": "Now a team member fixes the v2 bug.",
             "id": "bash",
-            "input": "istioctl replace -f service-be-v2-v3.yaml -n $KUBE_NAMESPACE"
+            "input": "kubectl apply -f service-be-v2-v3.yaml -n $KUBE_NAMESPACE"
         },
         {
             "title": "Looking good, so let's move all traffic to v3",
             "desc": "Reset the default route rule to v3.",
             "id": "bash",
-            "input": "istioctl replace -f service-be-v3.yaml -n $KUBE_NAMESPACE"
+            "input": "kubectl apply -f service-be-v3.yaml -n $KUBE_NAMESPACE"
         },
         {
             "title": "Are the results still skewed?",
@@ -112,7 +112,7 @@
             "title": "Clean up - back to v1",
             "desc": "The demo is done, so let's move everything back to v1.",
             "id": "bash",
-            "input": "istioctl replace -f services-all-v1.yaml -n $KUBE_NAMESPACE"
+            "input": "kubectl apply -f services-all-v1.yaml -n $KUBE_NAMESPACE"
         }
     ]
 }

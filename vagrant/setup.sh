@@ -117,8 +117,8 @@ echo "*** INSTALLING DEMO GATEWAYS ***"
 kubectl apply -f /vagrant/vagrant/istio/demo-gateway.yaml
 
 echo "*** ADDING ISTIO VIRTUAL SERVICES ***"
-istioctl create -f /vagrant/trafficshifting/istio/services-all-v1.yaml -n default
-istioctl create -f /vagrant/resiliency/istio/services.yaml -n default
+kubectl apply -f /vagrant/trafficshifting/istio/services-all-v1.yaml -n default
+kubectl apply -f /vagrant/resiliency/istio/services.yaml -n default
 
 # Adjust permissions due to having to run minikube as root
 echo "*** UPDATING MINIKUBE CONFIG/PERMISSIONS ***"

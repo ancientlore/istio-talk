@@ -43,21 +43,21 @@ Make sure the containers are running:
 Set up the virtual services and destination rules for each service:
 
     $ cd istio
-    $ istioctl create -f services-all-v1.yaml -n $KUBE_NAMESPACE
+    $ kubectl apply -f services-all-v1.yaml -n $KUBE_NAMESPACE
 
 > Note that you can generally use `kubectl` instead of `istioctl`, but `istioctl` provides additional client-side validation.
 
 You can check the virtual services using `istioctl get virtualservices` or `kubectl get virtualservices`. You can also fetch an individual service using:
 
-    $ istioctl get virtualservice topdogui -n $KUBE_NAMESPACE -o yaml
-    $ istioctl get virtualservice topdogmt -n $KUBE_NAMESPACE -o yaml
-    $ istioctl get virtualservice topdogbe -n $KUBE_NAMESPACE -o yaml
+    $ kubectl get virtualservice topdogui -n $KUBE_NAMESPACE -o yaml
+    $ kubectl get virtualservice topdogmt -n $KUBE_NAMESPACE -o yaml
+    $ kubectl get virtualservice topdogbe -n $KUBE_NAMESPACE -o yaml
 
 You can check the destination rules using `istioctl get destinationrules` or `kubectl get destinationrules`. You can also fetch an individual destination rule using:
 
-    $ istioctl get destinationrule topdogui -n $KUBE_NAMESPACE -o yaml
-    $ istioctl get destinationrule topdogmt -n $KUBE_NAMESPACE -o yaml
-    $ istioctl get destinatiorule topdogbe -n $KUBE_NAMESPACE -o yaml
+    $ kubectl get destinationrule topdogui -n $KUBE_NAMESPACE -o yaml
+    $ kubectl get destinationrule topdogmt -n $KUBE_NAMESPACE -o yaml
+    $ kubectl get destinatiorule topdogbe -n $KUBE_NAMESPACE -o yaml
 
 You're now ready to proceed with the demo.
 
@@ -75,7 +75,7 @@ View the user interface by running the following command (in a new shell) and th
 
 We start out with a [default set of virtual services and destination rules](istio/services-all-v1.yaml) that we created earlier:
 
-    $ istioctl create -f services-all-v1.yaml -n $KUBE_NAMESPACE
+    $ kubectl apply -f services-all-v1.yaml -n $KUBE_NAMESPACE
 
 These rules pass all traffic to the `v1` version of the services.
 
@@ -87,7 +87,7 @@ The first version works, but the results seem skewed to benefit the original dev
 
 Someone on the team decided to fix this. Let's test their version, routing traffic 50/50 between `v1` and `v2`.
 
-    $ istioctl replace -f service-be-v1-v2.yaml -n $KUBE_NAMESPACE
+    $ kubectl apply -f service-be-v1-v2.yaml -n $KUBE_NAMESPACE
 
 This [virtual service](istio/service-be-v1-v2.yaml) defines weighted routes so that traffic arriving uses both `v1` and `v2`.
 
@@ -95,21 +95,21 @@ This [virtual service](istio/service-be-v1-v2.yaml) defines weighted routes so t
 
 The second version fixed the original bug, but it introduced occasional failures. We noticed that retrying the request works. So, we decided to add in retries using [Istio] rather than back out the new service. We can't let the original developer be the top dog.
 
-    $ istioctl replace -f service-mt-retry.yaml -n $KUBE_NAMESPACE
+    $ kubectl apply -f service-mt-retry.yaml -n $KUBE_NAMESPACE
 
 The [retry logic](istio/service-mt-retry.yaml) fixes the problems, so we're going to move all the traffic to `v2` by [replacing the virtual service](istio/service-be-v2.yaml) and deleting the 50/50 rule.
     
-    $ istioctl replace -f service-be-v2.yaml -n $KUBE_NAMESPACE
+    $ kubectl apply -f service-be-v2.yaml -n $KUBE_NAMESPACE
 
 ## Third Version
 
 Now another team member decided that we really should fix the problem, even though we have worked around the issue. So let's start moving traffic 50/50 between `v2` and `v3` using a [new route](istio/service-be-v2-v3.yaml).
 
-    $ istioctl replace -f service-be-v2-v3.yaml -n $KUBE_NAMESPACE
+    $ kubectl apply -f service-be-v2-v3.yaml -n $KUBE_NAMESPACE
 
 That seems to look good, so we'll route all the traffic to `v3` by [replacing the virtual service](istio/service-be-v3.yaml), thus deleting the 50/50 rule.
 
-    $ istioctl replace -f service-be-v3.yaml -n $KUBE_NAMESPACE
+    $ kubectl apply -f service-be-v3.yaml -n $KUBE_NAMESPACE
 
 Do the results still seem skewed?
 
